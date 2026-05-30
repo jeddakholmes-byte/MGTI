@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="MGTI - 基于英雄联盟英雄人格的趣味测试，找到与你灵魂共鸣的英雄">
+  <meta name="theme-color" content="#0a0c14">
   <title>MGTI · 英雄联盟人格测试</title>
   <link rel="stylesheet" href="css/style.css">
   <link
@@ -19,18 +21,25 @@
         <div class="brand">
           <h1>MGTI</h1>
           <p>英雄联盟·人格测试</p>
+          <div class="brand-sub">—— 召唤你的本命英雄 ——</div>
         </div>
 
+        <!-- 题目区域 -->
         <div id="question-area" class="question-card">
           <!-- 动态渲染题目 -->
         </div>
 
+        <!-- 结果区域 -->
         <div id="result-area" class="result-card" style="display: none;">
           <!-- 动态渲染结果 -->
         </div>
 
+        <!-- 进度提示（动态文案） -->
+        <div id="progress-hint" class="progress-hint" style="display: none;"></div>
+
         <div class="nav-links">
           <a href="catalog.html" class="btn-outline">📖 英雄图鉴</a>
+          <!-- 分享按钮将在结果页动态显示，此处预留容器 -->
         </div>
       </div>
     </main>

@@ -3,8 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>英雄图鉴 · MGTI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="英雄联盟英雄人格图鉴 - 探索符文之地英雄的MBTI人格类型与深度解析">
+  <meta name="theme-color" content="#0a0c14">
+  <title>英雄图鉴 · MGTI · 探索人格与英雄的共鸣</title>
   <link rel="stylesheet" href="css/style.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
@@ -15,41 +17,42 @@
   <div class="app-container catalog-page">
     <header class="catalog-header">
       <h1>⚔️ 英雄图鉴</h1>
-      <p>探索符文之地的人格图谱</p>
+      <p>探索符文之地的人格图谱 · 点击英雄卡片查看深度人格解析</p>
       <div class="filter-bar">
-        <input type="text" id="search-input" placeholder="搜索英雄名称..." class="search-input">
+        <input type="text" id="search-input" placeholder="搜索英雄名称或别称（如：亚索、EZ、盲僧）..." class="search-input">
         <select id="mbti-filter" class="mbti-filter">
           <option value="all">全部人格</option>
-          <option value="INTJ">INTJ</option>
-          <option value="INTP">INTP</option>
-          <option value="ENTJ">ENTJ</option>
-          <option value="ENTP">ENTP</option>
-          <option value="INFJ">INFJ</option>
-          <option value="INFP">INFP</option>
-          <option value="ENFJ">ENFJ</option>
-          <option value="ENFP">ENFP</option>
-          <option value="ISTJ">ISTJ</option>
-          <option value="ISFJ">ISFJ</option>
-          <option value="ESTJ">ESTJ</option>
-          <option value="ESFJ">ESFJ</option>
-          <option value="ISTP">ISTP</option>
-          <option value="ISFP">ISFP</option>
-          <option value="ESTP">ESTP</option>
-          <option value="ESFP">ESFP</option>
+          <option value="INTJ">INTJ（建筑师）</option>
+          <option value="INTP">INTP（逻辑学家）</option>
+          <option value="ENTJ">ENTJ（指挥官）</option>
+          <option value="ENTP">ENTP（辩论家）</option>
+          <option value="INFJ">INFJ（提倡者）</option>
+          <option value="INFP">INFP（调停者）</option>
+          <option value="ENFJ">ENFJ（主人公）</option>
+          <option value="ENFP">ENFP（竞选者）</option>
+          <option value="ISTJ">ISTJ（物流师）</option>
+          <option value="ISFJ">ISFJ（守护者）</option>
+          <option value="ESTJ">ESTJ（总经理）</option>
+          <option value="ESFJ">ESFJ（执政官）</option>
+          <option value="ISTP">ISTP（鉴赏家）</option>
+          <option value="ISFP">ISFP（探险家）</option>
+          <option value="ESTP">ESTP（企业家）</option>
+          <option value="ESFP">ESFP（表演者）</option>
         </select>
       </div>
     </header>
 
     <div id="champion-grid" class="champion-grid">
       <!-- 动态渲染卡片 -->
-      <div class="loading">加载中...</div>
+      <div class="loading">✨ 正在召唤英雄...</div>
     </div>
 
     <div class="back-home">
-      <a href="index.html" class="btn-primary">← 返回测试</a>
+      <a href="index.html" class="btn-primary">← 返回人格测试</a>
     </div>
   </div>
 
+  <!-- 模态框容器将由 catalog.js 动态创建，无需提前写死 -->
   <script src="js/data.js"></script>
   <script src="js/catalog.js"></script>
 </body>
