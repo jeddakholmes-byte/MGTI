@@ -1,33 +1,44 @@
+// 存储所有英雄数据
 let allChampions = [];
 
+// 初始化图鉴页面
 async function initCatalog() {
-  allChampions = await loadChampions();
+  allChampions = await loadChampions();  // loadChampions 来自 data.js
   renderChampionGrid(allChampions);
   setupFilters();
 }
 
+// 渲染英雄卡片网格
 function renderChampionGrid(champions) {
   const grid = document.getElementById('champion-grid');
   if (!grid) return;
+
   if (!champions.length) {
     grid.innerHTML = '<div class="loading">暂无英雄数据，请确保 champions.json 已加载</div>';
     return;
   }
+
   let html = '';
   champions.forEach(champ => {
     const storyPlain = champ.story ? champ.story.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : '暂无故事';
+    // 确保头像 URL 存在，否则使用默认占位图
+    const avatarUrl = champ.image_url || 'https://ddragon.leagueoflegends.com/cdn/15.5.1/img/champion/default.png';
+
     html += `
-            <div class="champion-card" data-name="${champ.name}" data-mbti="${champ.mbti}">
+            <div class="champion-card" data-name="${champ.name}" data-mbti="${champ.mbti || '未知'}">
+                <div class="champion-avatar">
+                    <img src="${avatarUrl}" alt="${champ.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/80x80?text=No+Image'">
+                </div>
                 <div class="champion-name">${champ.name}</div>
                 <div class="champion-title">${champ.title || ''}</div>
                 <div class="champion-mbti">${champ.mbti || '未知'}</div>
-                <div class="story-snippet">${storyPlain}</div>
+                <div class="story-snippet">${escapeHtml(storyPlain)}</div>
             </div>
         `;
   });
   grid.innerHTML = html;
 
-  // 绑定点击详情
+  // 绑定卡片点击事件
   document.querySelectorAll('.champion-card').forEach(card => {
     card.addEventListener('click', () => {
       const name = card.dataset.name;
@@ -37,6 +48,18 @@ function renderChampionGrid(champions) {
   });
 }
 
+// 简单的防XSS辅助函数
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function (m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+// 设置搜索和筛选监听
 function setupFilters() {
   const searchInput = document.getElementById('search-input');
   const mbtiSelect = document.getElementById('mbti-filter');
@@ -56,27 +79,43 @@ function setupFilters() {
   mbtiSelect.addEventListener('change', filter);
 }
 
+// 显示英雄详情模态框（含原画）
 function showDetailModal(champion) {
-  // 创建模态框
+  // 获取或创建模态框
   let modal = document.querySelector('.modal');
   if (!modal) {
     modal = document.createElement('div');
     modal.className = 'modal';
-    modal.innerHTML = `<div class="modal-content"><span class="close-modal">&times;</span><div id="modal-body"></div></div>`;
+    modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="modal-body"></div>
+            </div>
+        `;
     document.body.appendChild(modal);
-    modal.querySelector('.close-modal').onclick = () => modal.style.display = 'none';
+
+    const closeBtn = modal.querySelector('.close-modal');
+    closeBtn.onclick = () => modal.style.display = 'none';
     window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
   }
+
   const bodyDiv = modal.querySelector('#modal-body');
   const storyFull = champion.story ? champion.story.replace(/<[^>]*>/g, '') : '没有详细故事';
+  // 优先使用原画 splash_url，若没有则使用头像
+  const splashUrl = champion.splash_url || champion.image_url || 'https://via.placeholder.com/1920x1080?text=No+Splash';
+
   bodyDiv.innerHTML = `
-        <h2>${champion.name}</h2>
-        <p><strong>称号：</strong>${champion.title || '未知'}</p>
-        <p><strong>MBTI：</strong>${champion.mbti || '待分类'}</p>
+        <div class="modal-splash">
+            <img src="${splashUrl}" alt="${champion.name}" onerror="this.src='https://via.placeholder.com/800x450?text=Image+Not+Found'">
+        </div>
+        <h2>${escapeHtml(champion.name)}</h2>
+        <p><strong>称号：</strong>${escapeHtml(champion.title || '未知')}</p>
+        <p><strong>MBTI：</strong>${escapeHtml(champion.mbti || '待分类')}</p>
         <p><strong>背景故事：</strong></p>
-        <p style="white-space: pre-wrap; font-size:0.9rem;">${storyFull.substring(0, 1200)}${storyFull.length > 1200 ? '……' : ''}</p>
+        <p style="white-space: pre-wrap; font-size:0.9rem;">${escapeHtml(storyFull.substring(0, 1200))}${storyFull.length > 1200 ? '……' : ''}</p>
     `;
   modal.style.display = 'flex';
 }
 
+// 页面加载完成后初始化
 window.addEventListener('DOMContentLoaded', initCatalog);
