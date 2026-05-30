@@ -4,63 +4,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="description" content="MGTI - 基于英雄联盟英雄人格的趣味测试，通过MBTI人格理论找到与你灵魂共鸣的本命英雄">
-  <meta name="keywords" content="英雄联盟,MBTI,人格测试,英雄联盟测试,本命英雄,符文之地">
+  <meta name="description"
+    content="MGTI 英雄联盟人格测试 - 基于 My Game Type Indicator 五维游戏人格体系，通过战术风格、团队角色、情绪反应、决策速度与英雄偏好，匹配与你最契合的本命英雄。">
+  <meta name="keywords" content="英雄联盟,MGTI,My Game Type Indicator,人格测试,英雄联盟测试,本命英雄,符文之地,游戏人格">
   <meta name="theme-color" content="#0a0c14">
+
+  <meta property="og:title" content="MGTI · 英雄联盟人格测试 · 召唤你的本命英雄">
+  <meta property="og:description" content="回答 20 道游戏行为题，生成你的 MGTI 五维人格画像，并匹配最契合你的英雄联盟本命英雄。">
+  <meta property="og:type" content="website">
+
   <title>MGTI · 英雄联盟人格测试 · 召唤你的本命英雄</title>
+
   <link rel="stylesheet" href="frontend/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap"
     rel="stylesheet">
-  <!-- 可选：添加 favicon -->
-  <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
+
+  <script src="frontend/js/data.js" defer></script>
+  <script src="frontend/js/test.js" defer></script>
 </head>
 
 <body>
   <div class="app-container">
     <main id="test-view" class="view active">
       <div class="hero-bg"></div>
+
       <div class="content-wrapper">
-        <div class="brand">
+        <header class="brand">
           <h1>MGTI</h1>
-          <p>英雄联盟·人格测试</p>
-          <div class="brand-sub">—— 召唤你的本命英雄 ——</div>
-        </div>
+          <p>英雄联盟 · 五维游戏人格测试</p>
+          <div class="brand-sub">—— My Game Type Indicator ——</div>
+        </header>
+
+        <section class="intro-card" aria-label="MGTI 体系介绍" style="margin-bottom: 1.5rem;">
+          <div
+            style="background: rgba(20, 28, 38, 0.62); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 1rem 1.2rem; color: #c0cfdf; font-size: 0.9rem; line-height: 1.7; backdrop-filter: blur(10px);">
+            <p>
+              通过 20 道游戏行为题，系统会计算你的
+              <strong style="color:#e2b86b;">战术风格</strong>、
+              <strong style="color:#e2b86b;">团队角色</strong>、
+              <strong style="color:#e2b86b;">情绪反应</strong>、
+              <strong style="color:#e2b86b;">决策速度</strong>、
+              <strong style="color:#e2b86b;">英雄偏好</strong>
+              五维画像，并从英雄图鉴中匹配与你最契合的本命英雄。
+            </p>
+          </div>
+        </section>
 
         <!-- 进度恢复提示横幅（默认隐藏，由 test.js 控制） -->
         <div id="resume-banner"
           style="display: none; background: rgba(226, 184, 107, 0.2); border: 1px solid #e2b86b; border-radius: 60px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; text-align: center; backdrop-filter: blur(8px);">
-          <span>📌 检测到未完成的测试，是否继续？</span>
+          <span>📌 检测到未完成的 MGTI 测试，是否继续？</span>
           <button id="resume-yes"
             style="margin-left: 1rem; background: #e2b86b; border: none; border-radius: 40px; padding: 0.3rem 1rem; cursor: pointer; font-weight: bold;">继续</button>
           <button id="resume-no"
-            style="margin-left: 0.5rem; background: transparent; border: 1px solid #e2b86b; border-radius: 40px; padding: 0.3rem 1rem; cursor: pointer;">重新开始</button>
+            style="margin-left: 0.5rem; background: transparent; border: 1px solid #e2b86b; color: #e2b86b; border-radius: 40px; padding: 0.3rem 1rem; cursor: pointer;">重新开始</button>
         </div>
 
-        <!-- 题目区域 -->
-        <div id="question-area" class="question-card">
+        <!-- 题目区域，由 test.js 动态渲染 -->
+        <section id="question-area" class="question-card" aria-live="polite" aria-label="MGTI 测试题目">
           <div class="loading">✨ 正在加载召唤师峡谷...</div>
-        </div>
+        </section>
 
-        <!-- 结果区域 -->
-        <div id="result-area" class="result-card" style="display: none;">
-          <!-- 动态渲染结果 -->
-        </div>
+        <!-- 结果区域，由 test.js 动态渲染 -->
+        <section id="result-area" class="result-card" aria-live="polite" aria-label="MGTI 测试结果" style="display: none;">
+        </section>
 
-        <div class="nav-links">
+        <nav class="nav-links" aria-label="页面导航">
           <a href="catalog.html" class="btn-outline">📖 英雄图鉴</a>
-        </div>
+        </nav>
 
-        <footer style="text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.6;">
-          <p>⚔️ 基于英雄联盟世界观 · MGTI 人格测试</p>
-          <p>数据来源：英雄联盟宇宙 | 仅供娱乐与人格探索</p>
+        <footer style="text-align: center; margin-top: 2rem; font-size: 0.75rem; opacity: 0.65;">
+          <p>⚔️ MGTI · My Game Type Indicator</p>
+          <p>基于英雄联盟世界观与英雄机制的五维游戏人格测试，仅供娱乐与人格探索。</p>
         </footer>
       </div>
     </main>
   </div>
 
-  <script src="frontend/js/data.js"></script>
-  <script src="frontend/js/test.js"></script>
+  <noscript>
+    <div style="padding: 1rem; text-align: center; color: #e2b86b;">
+      本页面需要启用 JavaScript 才能开始 MGTI 测试。
+    </div>
+  </noscript>
 </body>
 
 </html>
