@@ -1,0 +1,340 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(145deg, #0a0c14 0%, #11161f 100%);
+  color: #e9f1f7;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+.app-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  position: relative;
+}
+
+/* 测试页背景光效 */
+.hero-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(80, 100, 200, 0.15), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brand h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f0c45a, #c87e2f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.brand p {
+  color: #8d9db0;
+  font-size: 1rem;
+}
+
+/* 问题卡片 */
+.question-card,
+.result-card {
+  background: rgba(20, 28, 38, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 32px;
+  padding: 2rem 2rem 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s;
+}
+
+.question-text {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  line-height: 1.3;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.option-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 60px;
+  padding: 1rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #eef4ff;
+}
+
+.option-btn:hover {
+  background: rgba(210, 180, 100, 0.2);
+  border-color: #e2b86b;
+  transform: translateX(5px);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #9aaebf;
+  margin-top: 1rem;
+}
+
+/* 结果卡片 */
+.result-card {
+  text-align: center;
+}
+
+.champion-match {
+  margin: 1.5rem 0;
+}
+
+.match-name {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(120deg, #ffd966, #ff9f4a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0.5rem 0;
+}
+
+.match-title {
+  font-size: 1rem;
+  color: #c0cfdf;
+}
+
+.mbti-badge {
+  display: inline-block;
+  background: #2a3a44;
+  padding: 0.3rem 1rem;
+  border-radius: 40px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 1rem 0;
+}
+
+.story-preview {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 24px;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  color: #cbdbe2;
+}
+
+.btn-primary,
+.btn-outline {
+  display: inline-block;
+  padding: 0.8rem 1.6rem;
+  border-radius: 40px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+  cursor: pointer;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: linear-gradient(95deg, #e2b86b, #c5812e);
+  color: #0f111a;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #e2b86b;
+  color: #e2b86b;
+  margin-top: 1rem;
+}
+
+.nav-links {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* 图鉴页面 */
+.catalog-page {
+  max-width: 1400px;
+}
+
+.catalog-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.filter-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.search-input,
+.mbti-filter {
+  padding: 0.7rem 1.2rem;
+  border-radius: 60px;
+  background: #1e2a32;
+  border: 1px solid #33454f;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.search-input:focus,
+.mbti-filter:focus {
+  border-color: #e2b86b;
+}
+
+.champion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.champion-card {
+  background: rgba(15, 23, 32, 0.7);
+  backdrop-filter: blur(6px);
+  border-radius: 28px;
+  padding: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.champion-card:hover {
+  transform: translateY(-5px);
+  border-color: #e2b86b;
+  background: rgba(30, 40, 52, 0.85);
+}
+
+.champion-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.champion-title {
+  font-size: 0.8rem;
+  color: #b7c9d9;
+  margin-bottom: 0.5rem;
+}
+
+.champion-mbti {
+  display: inline-block;
+  background: #2c3e44;
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.story-snippet {
+  font-size: 0.8rem;
+  color: #b0bed0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.back-home {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #aaa;
+}
+
+/* 模态框 */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #141e26;
+  max-width: 600px;
+  width: 90%;
+  border-radius: 32px;
+  padding: 2rem;
+  position: relative;
+  border: 1px solid #e2b86b;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+@media (max-width: 640px) {
+  .question-text {
+    font-size: 1.3rem;
+  }
+
+  .option-btn {
+    padding: 0.8rem 1.2rem;
+  }
+}

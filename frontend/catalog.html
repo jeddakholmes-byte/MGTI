@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英雄图鉴 · MGTI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div class="app-container catalog-page">
+    <header class="catalog-header">
+      <h1>⚔️ 英雄图鉴</h1>
+      <p>探索符文之地的人格图谱</p>
+      <div class="filter-bar">
+        <input type="text" id="search-input" placeholder="搜索英雄名称..." class="search-input">
+        <select id="mbti-filter" class="mbti-filter">
+          <option value="all">全部人格</option>
+          <option value="INTJ">INTJ</option>
+          <option value="INTP">INTP</option>
+          <option value="ENTJ">ENTJ</option>
+          <option value="ENTP">ENTP</option>
+          <option value="INFJ">INFJ</option>
+          <option value="INFP">INFP</option>
+          <option value="ENFJ">ENFJ</option>
+          <option value="ENFP">ENFP</option>
+          <option value="ISTJ">ISTJ</option>
+          <option value="ISFJ">ISFJ</option>
+          <option value="ESTJ">ESTJ</option>
+          <option value="ESFJ">ESFJ</option>
+          <option value="ISTP">ISTP</option>
+          <option value="ISFP">ISFP</option>
+          <option value="ESTP">ESTP</option>
+          <option value="ESFP">ESFP</option>
+        </select>
+      </div>
+    </header>
+
+    <div id="champion-grid" class="champion-grid">
+      <!-- 动态渲染卡片 -->
+      <div class="loading">加载中...</div>
+    </div>
+
+    <div class="back-home">
+      <a href="index.html" class="btn-primary">← 返回测试</a>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/catalog.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>MGTI · 英雄联盟人格测试</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- 测试界面 -->
+    <main id="test-view" class="view active">
+      <div class="hero-bg"></div>
+      <div class="content-wrapper">
+        <div class="brand">
+          <h1>MGTI</h1>
+          <p>英雄联盟·人格测试</p>
+        </div>
+
+        <div id="question-area" class="question-card">
+          <!-- 动态渲染问题 -->
+        </div>
+
+        <div id="result-area" class="result-card" style="display: none;">
+          <!-- 动态渲染结果 -->
+        </div>
+
+        <div class="nav-links">
+          <a href="catalog.html" class="btn-outline">📖 英雄图鉴</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/test.js"></script>
+</body>
+
+</html>
