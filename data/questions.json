@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "questions": [
+    {
+      "text": "我很少计算对方技能冷却，全靠感觉打。",
+      "dimension": "TAC",
+      "reverse": false
+    },
+    {
+      "text": "我会在脑中模拟对线换血的收益再动手。",
+      "dimension": "TAC",
+      "reverse": true
+    },
+    {
+      "text": "比起操作，我更看重意识和宏观决策。",
+      "dimension": "TAC",
+      "reverse": true
+    },
+    {
+      "text": "我经常凭本能打出惊人的操作。",
+      "dimension": "TAC",
+      "reverse": false
+    },
+    {
+      "text": "我更享受独自带穿一条路，而不是跟团。",
+      "dimension": "TEA",
+      "reverse": false
+    },
+    {
+      "text": "只要团战需要，我可以放弃自己的发育去支援。",
+      "dimension": "TEA",
+      "reverse": true
+    },
+    {
+      "text": "我是个可靠的队友，总在关键时刻支援。",
+      "dimension": "TEA",
+      "reverse": true
+    },
+    {
+      "text": "我喜欢一个人单打独斗，不需要队友帮忙。",
+      "dimension": "TEA",
+      "reverse": false
+    },
+    {
+      "text": "逆风时我会忍不住发起投降。",
+      "dimension": "EMO",
+      "reverse": false
+    },
+    {
+      "text": "无论优势劣势，我都能保持冷静操作。",
+      "dimension": "EMO",
+      "reverse": true
+    },
+    {
+      "text": "我激情四射，打起来容易上头。",
+      "dimension": "EMO",
+      "reverse": false
+    },
+    {
+      "text": "被单杀后我能迅速调整心态重新出发。",
+      "dimension": "EMO",
+      "reverse": true
+    },
+    {
+      "text": "看到残血我就忍不住闪现追，不管有没有视野。",
+      "dimension": "DEC",
+      "reverse": false
+    },
+    {
+      "text": "我会等到队友到位再开团，绝不一个人上。",
+      "dimension": "DEC",
+      "reverse": true
+    },
+    {
+      "text": "机会出现时我绝不犹豫，立刻发起进攻。",
+      "dimension": "DEC",
+      "reverse": false
+    },
+    {
+      "text": "我在动手前会充分评估风险和收益。",
+      "dimension": "DEC",
+      "reverse": true
+    },
+    {
+      "text": "我喜欢玩刺客或战士，享受秒人的快感。",
+      "dimension": "PRE",
+      "reverse": false
+    },
+    {
+      "text": "我习惯玩射手或法师，在安全位置输出。",
+      "dimension": "PRE",
+      "reverse": true
+    },
+    {
+      "text": "我倾向于选择风险高但收益大的英雄。",
+      "dimension": "PRE",
+      "reverse": false
+    },
+    {
+      "text": "我更喜欢稳健输出的传统角色。",
+      "dimension": "PRE",
+      "reverse": true
+    }
+  ]
+}

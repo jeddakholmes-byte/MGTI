@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "dimensions": [
+    {
+      "id": "TAC",
+      "name": "战术风格",
+      "lowLabel": "直觉型",
+      "highLabel": "谋略型",
+      "lowDesc": "凭感觉操作",
+      "highDesc": "精于计算"
+    },
+    {
+      "id": "TEA",
+      "name": "团队角色",
+      "lowLabel": "独行侠",
+      "highLabel": "团队核心",
+      "lowDesc": "喜欢单带",
+      "highDesc": "积极支援"
+    },
+    {
+      "id": "EMO",
+      "name": "情绪反应",
+      "lowLabel": "冷静",
+      "highLabel": "激情",
+      "lowDesc": "逆风不慌",
+      "highDesc": "易上头"
+    },
+    {
+      "id": "DEC",
+      "name": "决策速度",
+      "lowLabel": "谨慎",
+      "highLabel": "果敢",
+      "lowDesc": "三思后行",
+      "highDesc": "说干就干"
+    },
+    {
+      "id": "PRE",
+      "name": "英雄偏好",
+      "lowLabel": "传统",
+      "highLabel": "异类",
+      "lowDesc": "射手/法师",
+      "highDesc": "刺客/战士"
+    }
+  ]
+}
