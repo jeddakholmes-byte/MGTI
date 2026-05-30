@@ -777,7 +777,7 @@ function getHeroDeepAnalysis(hero) {
 // 加载 champions.json，并附加 MBTI、解析等字段
 async function loadChampions() {
   try {
-    const response = await fetch('../data/champions.json');
+    const response = await fetch('./data/champions.json');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     let champions = await response.json();
     champions = champions.map(champ => {

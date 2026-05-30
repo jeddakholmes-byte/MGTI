@@ -35,10 +35,6 @@ MGTI/
 
 ├── frontend/                 # 前端交互页面
 
-│   ├── index.html            # 人格测试主页面
-
-│   ├── catalog.html          # 英雄图鉴页面
-
 │   ├── css/
 
 │   │   └── style.css         # 全局样式
@@ -54,6 +50,10 @@ MGTI/
 ├── .gitignore                # Git 忽略文件配置
 
 ├── README.md                 # 项目文档
+
+├── index.html            # 人格测试主页面
+
+├── catalog.html          # 英雄图鉴页面
 
 └── requirements.txt          # Python 依赖配置
 ```
