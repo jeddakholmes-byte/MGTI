@@ -13,6 +13,23 @@ const DEFAULT_HERO_DIMENSIONS = Object.freeze({
   PRE: 0
 });
 
+// 数据文件名集中管理。后续如果拆分题库、皮肤、地区等数据，可以在这里继续扩展。
+const MGTI_DATA_FILES = Object.freeze({
+  dimensions: "dimensions.json",
+  questions: "questions.json",
+  heroProfiles: "heroes_profile.json",
+  resultTemplates: "result_templates.json",
+  champions: "champions.json"
+});
+
+// 默认部署路径。
+// - 本地开发：./data/
+// - GitHub Pages / 静态站生产环境：/MGTI/data/
+// 如项目部署在其他目录，可在 config.js 中设置 window.MGTI_CONFIG.DATA_BASE_PATH 覆盖。
+const DEFAULT_LOCAL_DATA_BASE_PATH = "./data/";
+const DEFAULT_PRODUCTION_DATA_BASE_PATH = "/MGTI/data/";
+const FETCH_TIMEOUT_MS = 8000;
+
 // 全局英雄数据。loadChampions() 成功后会更新 window.championsData。
 let championsData = [];
 
@@ -517,49 +534,6 @@ function getDefaultResultTemplates() {
 }
 
 // ==================== 通用工具函数 ====================
-function getDataPathCandidates(fileName) {
-  if (!fileName) return [];
-
-  // 如果传入的是完整路径，则按原路径尝试。
-  if (
-    fileName.startsWith("http://") ||
-    fileName.startsWith("https://") ||
-    fileName.startsWith("/") ||
-    fileName.startsWith("./") ||
-    fileName.startsWith("../")
-  ) {
-    return [fileName];
-  }
-
-  // 兼容两种启动方式：
-  // 1. 从项目根目录打开 index.html / catalog.html：./data/file.json
-  // 2. 从 frontend/ 目录打开页面：../data/file.json
-  return [`./data/${fileName}`, `../data/${fileName}`, `/data/${fileName}`];
-}
-
-async function fetchJsonWithFallback(fileName, fallbackValue) {
-  const candidates = getDataPathCandidates(fileName);
-  let lastError = null;
-
-  for (const path of candidates) {
-    try {
-      const response = await fetch(path, { cache: "no-cache" });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      lastError = error;
-      console.warn(`[MGTI] 加载 ${path} 失败，尝试下一个路径。`, error);
-    }
-  }
-
-  console.error(`[MGTI] ${fileName} 加载失败，已使用默认值。`, lastError);
-  return fallbackValue;
-}
-
 function isPlainObject(value) {
   return Object.prototype.toString.call(value) === "[object Object]";
 }
@@ -571,6 +545,165 @@ function toFiniteNumber(value, fallback = 0) {
 
 function clamp(value, min = -2, max = 2) {
   return Math.min(max, Math.max(min, value));
+}
+
+function uniqueArray(values) {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function normalizeBasePath(path) {
+  const raw = String(path || "").trim();
+  if (!raw) return "";
+  return raw.endsWith("/") ? raw : `${raw}/`;
+}
+
+function isAbsoluteDataPath(fileName) {
+  const raw = String(fileName || "");
+  return (
+    raw.startsWith("http://") ||
+    raw.startsWith("https://") ||
+    raw.startsWith("/") ||
+    raw.startsWith("./") ||
+    raw.startsWith("../")
+  );
+}
+
+function getRuntimeConfig() {
+  const config = isPlainObject(window.MGTI_CONFIG) ? window.MGTI_CONFIG : {};
+  return {
+    dataBasePath: normalizeBasePath(config.DATA_BASE_PATH || window.MGTI_DATA_BASE_PATH || ""),
+    dataPathCandidates: Array.isArray(config.DATA_PATH_CANDIDATES)
+      ? config.DATA_PATH_CANDIDATES.map(normalizeBasePath).filter(Boolean)
+      : [],
+    fetchTimeoutMs: toFiniteNumber(config.FETCH_TIMEOUT_MS, FETCH_TIMEOUT_MS),
+    debug: Boolean(config.DEBUG || window.MGTI_DEBUG)
+  };
+}
+
+function isLocalRuntime() {
+  const host = window.location?.hostname || "";
+  const protocol = window.location?.protocol || "";
+  return (
+    protocol === "file:" ||
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0" ||
+    host.endsWith(".local")
+  );
+}
+
+function getPrimaryDataBasePath() {
+  const runtimeConfig = getRuntimeConfig();
+  if (runtimeConfig.dataBasePath) return runtimeConfig.dataBasePath;
+  return isLocalRuntime() ? DEFAULT_LOCAL_DATA_BASE_PATH : DEFAULT_PRODUCTION_DATA_BASE_PATH;
+}
+
+function getDataPathCandidates(fileName) {
+  if (!fileName) return [];
+
+  const rawFileName = String(fileName).trim();
+
+  // 如果调用方传入的是完整路径或明确相对路径，优先尊重该路径。
+  if (isAbsoluteDataPath(rawFileName)) {
+    return uniqueArray([rawFileName]);
+  }
+
+  const runtimeConfig = getRuntimeConfig();
+  const primaryBasePath = getPrimaryDataBasePath();
+
+  // 回退顺序有意保持稳定：配置路径 > 当前环境主路径 > 常见开发路径 > 根目录路径。
+  // 这样线上部署不会被 ../data/ 抢先误命中，本地打开也仍然能回退。
+  return uniqueArray([
+    ...runtimeConfig.dataPathCandidates.map((basePath) => `${basePath}${rawFileName}`),
+    `${primaryBasePath}${rawFileName}`,
+    `./data/${rawFileName}`,
+    `../data/${rawFileName}`,
+    `/data/${rawFileName}`,
+    `${DEFAULT_PRODUCTION_DATA_BASE_PATH}${rawFileName}`
+  ]);
+}
+
+function showUserError(message, options = {}) {
+  const text = String(message || "系统暂时无法完成操作，请稍后重试。");
+  const duration = toFiniteNumber(options.duration, 3600);
+
+  try {
+    let toast = document.getElementById("mgti-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "mgti-toast";
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      document.body.appendChild(toast);
+    }
+
+    toast.className = options.type ? `mgti-toast-${options.type}` : "mgti-toast-error";
+    toast.textContent = text;
+    toast.hidden = false;
+
+    if (toast._mgtiTimer) {
+      window.clearTimeout(toast._mgtiTimer);
+    }
+
+    toast._mgtiTimer = window.setTimeout(() => {
+      toast.hidden = true;
+      toast.remove();
+    }, duration);
+  } catch (error) {
+    // Toast 失败不应影响主流程。
+    console.warn("[MGTI] 用户错误提示渲染失败：", error);
+  }
+}
+
+async function fetchWithTimeout(path, timeoutMs) {
+  const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const timer = controller
+    ? window.setTimeout(() => controller.abort(), timeoutMs)
+    : null;
+
+  try {
+    return await fetch(path, {
+      cache: "no-cache",
+      signal: controller?.signal
+    });
+  } finally {
+    if (timer) window.clearTimeout(timer);
+  }
+}
+
+async function fetchJsonWithFallback(fileName, fallbackValue, options = {}) {
+  const candidates = getDataPathCandidates(fileName);
+  const runtimeConfig = getRuntimeConfig();
+  let lastError = null;
+
+  for (const path of candidates) {
+    try {
+      const response = await fetchWithTimeout(path, runtimeConfig.fetchTimeoutMs);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      }
+
+      const json = await response.json();
+
+      if (runtimeConfig.debug) {
+        console.info(`[MGTI] ${fileName} 加载成功：${path}`);
+      }
+
+      return json;
+    } catch (error) {
+      lastError = error;
+      console.warn(`[MGTI] 加载 ${path} 失败，尝试下一个路径。`, error);
+    }
+  }
+
+  console.error(`[MGTI] ${fileName} 加载失败，已使用默认值。`, lastError);
+
+  if (options.userMessage) {
+    showUserError(options.userMessage);
+  }
+
+  return fallbackValue;
 }
 
 function normalizeDimensionObject(dimensions) {
@@ -587,6 +720,62 @@ function normalizeDimensionObject(dimensions) {
 function dimensionsToVector(dimensions) {
   const normalized = normalizeDimensionObject(dimensions);
   return MGTI_DIMENSION_IDS.map((id) => normalized[id]);
+}
+
+function normalizeDimensionMeta(meta) {
+  const item = isPlainObject(meta) ? meta : {};
+  const id = String(item.id || "").trim().toUpperCase();
+
+  if (!MGTI_DIMENSION_IDS.includes(id)) return null;
+
+  return {
+    ...item,
+    id,
+    name: item.name || id,
+    lowLabel: item.lowLabel || "低分倾向",
+    highLabel: item.highLabel || "高分倾向",
+    lowDesc: item.lowDesc || "偏向低分侧的游戏行为。",
+    highDesc: item.highDesc || "偏向高分侧的游戏行为。"
+  };
+}
+
+function normalizeQuestion(question, index) {
+  const item = isPlainObject(question) ? question : {};
+  const dimension = String(item.dimension || "").trim().toUpperCase();
+
+  if (!item.text || !MGTI_DIMENSION_IDS.includes(dimension)) {
+    console.warn(`[MGTI] 第 ${index + 1} 道题格式异常，已跳过。`, question);
+    return null;
+  }
+
+  return {
+    ...item,
+    id: item.id || `Q${String(index + 1).padStart(2, "0")}`,
+    text: String(item.text).trim(),
+    dimension,
+    reverse: Boolean(item.reverse)
+  };
+}
+
+function normalizeRoleList(roles) {
+  const validRoles = new Set(["assassin", "fighter", "mage", "marksman", "support", "tank"]);
+  if (!Array.isArray(roles)) return [];
+  return uniqueArray(roles.map((role) => String(role || "").trim().toLowerCase()))
+    .filter((role) => validRoles.has(role));
+}
+
+function normalizeTagList(tags) {
+  if (!Array.isArray(tags)) return [];
+  return uniqueArray(tags.map((tag) => String(tag || "").trim()).filter(Boolean));
+}
+
+function normalizeReleaseDate(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const match = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (!match) return raw;
+  const [, year, month, day] = match;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
 function resolveHeroName(input) {
@@ -607,6 +796,23 @@ function resolveHeroName(input) {
   return raw;
 }
 
+function findHeroProfile(hero, profileMap) {
+  const candidates = uniqueArray([
+    hero?.name,
+    hero?.title,
+    hero?.alias,
+    resolveHeroName(hero?.name),
+    resolveHeroName(hero?.title),
+    resolveHeroName(hero?.alias)
+  ].map((value) => String(value || "").trim()));
+
+  for (const name of candidates) {
+    if (profileMap[name]) return profileMap[name];
+  }
+
+  return null;
+}
+
 function getDimensionMeta(dimensionId) {
   return (window.dimensions || []).find((dimension) => dimension.id === dimensionId) || null;
 }
@@ -617,29 +823,104 @@ function getDimensionLabel(dimensionId, value) {
   return value >= 0 ? meta.highLabel : meta.lowLabel;
 }
 
+function mergeResultTemplates(base, incoming) {
+  const source = isPlainObject(incoming) ? incoming : {};
+  return {
+    ...base,
+    ...source,
+    dimensionPhrases: {
+      ...(base.dimensionPhrases || {}),
+      ...(source.dimensionPhrases || {})
+    },
+    roleDescriptions: {
+      ...(base.roleDescriptions || {}),
+      ...(source.roleDescriptions || {})
+    },
+    dimensionExplanations: {
+      ...(base.dimensionExplanations || {}),
+      ...(source.dimensionExplanations || {})
+    },
+    consistency: {
+      ...(base.consistency || {}),
+      ...(source.consistency || {})
+    }
+  };
+}
+
 // ==================== 配置文件加载函数 ====================
 async function loadDimensions() {
-  const data = await fetchJsonWithFallback("dimensions.json", getDefaultDimensions());
-  window.dimensions = Array.isArray(data?.dimensions) ? data.dimensions : [];
+  const data = await fetchJsonWithFallback(
+    MGTI_DATA_FILES.dimensions,
+    getDefaultDimensions(),
+    { userMessage: "维度配置加载失败，已临时使用默认配置。" }
+  );
+
+  const rawDimensions = Array.isArray(data?.dimensions) ? data.dimensions : [];
+  const normalized = rawDimensions
+    .map(normalizeDimensionMeta)
+    .filter(Boolean);
+
+  const missingIds = MGTI_DIMENSION_IDS.filter((id) => !normalized.some((item) => item.id === id));
+  missingIds.forEach((id) => {
+    normalized.push({
+      id,
+      name: id,
+      lowLabel: "低分倾向",
+      highLabel: "高分倾向",
+      lowDesc: "偏向低分侧的游戏行为。",
+      highDesc: "偏向高分侧的游戏行为。"
+    });
+    console.warn(`[MGTI] dimensions.json 缺少 ${id}，已补入兜底维度。`);
+  });
+
+  window.dimensions = normalized;
   return window.dimensions;
 }
 
 async function loadQuestions() {
-  const data = await fetchJsonWithFallback("questions.json", getDefaultQuestions());
-  window.questions = Array.isArray(data?.questions) ? data.questions : [];
+  const data = await fetchJsonWithFallback(
+    MGTI_DATA_FILES.questions,
+    getDefaultQuestions(),
+    { userMessage: "题库加载失败，请检查 data/questions.json。" }
+  );
+
+  const rawQuestions = Array.isArray(data?.questions) ? data.questions : [];
+  window.questions = rawQuestions
+    .map(normalizeQuestion)
+    .filter(Boolean);
+
+  window.questionMeta = {
+    version: data?.version || "fallback",
+    consistency: data?.consistency || null,
+    scoring: data?.scoring || null,
+    total: window.questions.length
+  };
+
   return window.questions;
 }
 
 async function loadHeroProfiles() {
-  const data = await fetchJsonWithFallback("heroes_profile.json", getDefaultHeroProfiles());
+  const data = await fetchJsonWithFallback(
+    MGTI_DATA_FILES.heroProfiles,
+    getDefaultHeroProfiles(),
+    { userMessage: "英雄五维画像加载失败，匹配结果可能不准确。" }
+  );
 
   if (!isPlainObject(data) || !isPlainObject(data.heroes)) {
-    console.warn("[MGTI] heroes_profile.json 格式异常，已使用默认英雄五维数据。");
+    console.warn("[MGTI] heroes_profile.json 格式异常，已使用默认英雄五维数据。", data);
     window.heroProfiles = getDefaultHeroProfiles();
   } else {
+    const normalizedHeroes = {};
+    Object.entries(data.heroes).forEach(([heroName, dimensions]) => {
+      if (!heroName) return;
+      normalizedHeroes[heroName] = normalizeDimensionObject(dimensions);
+    });
+
+    // 保留 scale、dimensionRules、calibrationNotes 等维护字段，方便后续调试和数据校验。
     window.heroProfiles = {
+      ...data,
       version: data.version || "1.0",
-      heroes: data.heroes
+      heroes: normalizedHeroes
     };
   }
 
@@ -647,20 +928,18 @@ async function loadHeroProfiles() {
 }
 
 async function loadResultTemplates() {
-  const data = await fetchJsonWithFallback("result_templates.json", getDefaultResultTemplates());
+  const fallbackTemplates = getDefaultResultTemplates();
+  const data = await fetchJsonWithFallback(
+    MGTI_DATA_FILES.resultTemplates,
+    fallbackTemplates,
+    { userMessage: "结果页模板加载失败，已使用默认文案。" }
+  );
 
   if (!isPlainObject(data)) {
-    console.warn("[MGTI] result_templates.json 格式异常，已使用默认结果模板。");
-    window.resultTemplates = getDefaultResultTemplates();
+    console.warn("[MGTI] result_templates.json 格式异常，已使用默认结果模板。", data);
+    window.resultTemplates = fallbackTemplates;
   } else {
-    window.resultTemplates = {
-      ...getDefaultResultTemplates(),
-      ...data,
-      dimensionPhrases: {
-        ...getDefaultResultTemplates().dimensionPhrases,
-        ...(data.dimensionPhrases || {})
-      }
-    };
+    window.resultTemplates = mergeResultTemplates(fallbackTemplates, data);
   }
 
   return window.resultTemplates;
@@ -687,22 +966,51 @@ async function loadChampions() {
   // 先加载 MGTI 配置，确保英雄五维数据可以被合并。
   await loadMGTIConfigs();
 
-  const rawChampions = await fetchJsonWithFallback("champions.json", []);
+  const rawChampions = await fetchJsonWithFallback(
+    MGTI_DATA_FILES.champions,
+    [],
+    { userMessage: "英雄基础数据加载失败，请刷新页面或检查部署路径。" }
+  );
   const heroesProfileMap = window.heroProfiles?.heroes || {};
 
   if (!Array.isArray(rawChampions)) {
     console.error("[MGTI] champions.json 格式错误：根节点应为数组。", rawChampions);
+    showUserError("英雄数据格式错误，无法生成图鉴。请检查 champions.json。");
     championsData = [];
     window.championsData = championsData;
     return championsData;
   }
 
-  championsData = rawChampions.map((hero) => {
-    const heroName = hero?.name || "";
-    const dimensions = normalizeDimensionObject(heroesProfileMap[heroName]);
+  const uniqueMap = new Map();
+  rawChampions.forEach((hero, index) => {
+    const heroId = String(hero?.id ?? "").trim();
+    const fallbackKey = `__missing_id_${index}_${hero?.name || hero?.title || "unknown"}`;
+    const key = heroId || fallbackKey;
 
+    if (uniqueMap.has(key)) {
+      const existed = uniqueMap.get(key);
+      console.warn(
+        `[MGTI] 重复英雄 ID: ${key} (${hero?.name || "未知英雄"})，将保留第一个：${existed?.name || "未知英雄"}`,
+        hero
+      );
+      return;
+    }
+
+    uniqueMap.set(key, hero);
+  });
+
+  const uniqueChampions = Array.from(uniqueMap.values());
+  const missingProfileNames = [];
+
+  championsData = uniqueChampions.map((hero, index) => {
     // 不再把 mbti 字段放入前端英雄对象，避免 catalog/test 继续误用旧体系。
     const { mbti, ...baseHero } = hero || {};
+    const profile = findHeroProfile(baseHero, heroesProfileMap);
+    const dimensions = normalizeDimensionObject(profile);
+
+    if (!profile) {
+      missingProfileNames.push(baseHero.name || baseHero.title || baseHero.alias || `第 ${index + 1} 个英雄`);
+    }
 
     return {
       ...baseHero,
@@ -711,18 +1019,29 @@ async function loadChampions() {
       title: baseHero.title || "",
       alias: baseHero.alias || "",
       story: baseHero.story || "暂无故事数据",
-      roles: Array.isArray(baseHero.roles) ? baseHero.roles : [],
-      tags: Array.isArray(baseHero.tags) ? baseHero.tags : [],
-      release_date: baseHero.release_date || "",
+      roles: normalizeRoleList(baseHero.roles),
+      tags: normalizeTagList(baseHero.tags),
+      release_date: normalizeReleaseDate(baseHero.release_date),
       image_url: baseHero.image_url || "",
       splash_url: baseHero.splash_url || "",
       dimensions,
-      vector: dimensionsToVector(dimensions)
+      vector: dimensionsToVector(dimensions),
+      _dataIndex: index
     };
   });
 
   window.championsData = championsData;
-  console.info(`[MGTI] 英雄数据加载完成：${championsData.length} 个英雄。`);
+
+  if (missingProfileNames.length) {
+    console.warn(
+      `[MGTI] ${missingProfileNames.length} 个英雄缺少 heroes_profile.json 五维画像，已使用 0 值兜底。`,
+      missingProfileNames.slice(0, 30)
+    );
+  }
+
+  console.info(
+    `[MGTI] 英雄数据加载完成：${championsData.length} 个英雄。原始 ${rawChampions.length} 个，去重后 ${uniqueChampions.length} 个。`
+  );
 
   return championsData;
 }
@@ -812,6 +1131,11 @@ function searchChampionName(keyword) {
 
 // ==================== 全局导出 ====================
 window.heroAliasMap = heroAliasMap;
+window.MGTI_DATA_FILES = MGTI_DATA_FILES;
+window.DEFAULT_HERO_DIMENSIONS = DEFAULT_HERO_DIMENSIONS;
+window.getDataPathCandidates = getDataPathCandidates;
+window.getPrimaryDataBasePath = getPrimaryDataBasePath;
+window.showUserError = window.showUserError || showUserError;
 window.loadDimensions = loadDimensions;
 window.loadQuestions = loadQuestions;
 window.loadHeroProfiles = loadHeroProfiles;
@@ -826,3 +1150,13 @@ window.getDimensionMeta = getDimensionMeta;
 window.getDimensionLabel = getDimensionLabel;
 window.searchChampionName = searchChampionName;
 window.normalizeDimensionObject = normalizeDimensionObject;
+window.dimensionsToVector = dimensionsToVector;
+window.MGTIDataDebug = {
+  getRuntimeConfig,
+  getDataPathCandidates,
+  getPrimaryDataBasePath,
+  normalizeDimensionObject,
+  dimensionsToVector,
+  normalizeQuestion,
+  normalizeDimensionMeta
+};

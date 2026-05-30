@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const PROGRESS_KEY = "mgti_progress_v2";
   const PROGRESS_VERSION = "2.0";
   const DIMENSION_IDS = window.MGTI_DIMENSION_IDS || ["TAC", "TEA", "EMO", "DEC", "PRE"];
+  const ANSWER_THROTTLE_MS = 300;
+  const SCORE_MIN = -2;
+  const SCORE_MAX = 2;
+  const CONSISTENCY_SIGNIFICANT_RAW_ABS = 1;
 
   // 注意：
   // 为了让题库里的 reverse 方向正确，这里的按钮 rawValue 不是“同意程度正分”，而是“低分倾向强度”。
@@ -33,7 +37,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let dimensionCounts = createEmptyDimensionMap();
   let answerRecords = [];
   let isAnswering = false;
+  let lastAnswerTime = 0;
   let totalQuestions = 0;
+  let consistencyReport = createEmptyConsistencyReport();
 
   // ==================== 初始化 ====================
   try {
@@ -164,27 +170,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ==================== 处理答案 ====================
   function handleAnswer(rawValue) {
+    const now = Date.now();
+
     if (isAnswering) return;
+    if (now - lastAnswerTime < ANSWER_THROTTLE_MS) return;
 
     const q = window.questions[currentIndex];
     if (!q) return;
 
+    lastAnswerTime = now;
     isAnswering = true;
 
-    let score = Number(rawValue);
-    if (!Number.isFinite(score)) score = 0;
+    let rawScore = Number(rawValue);
+    if (!Number.isFinite(rawScore)) rawScore = 0;
+    rawScore = clamp(rawScore, SCORE_MIN, SCORE_MAX);
 
+    let score = rawScore;
     if (q.reverse) {
       score = -score;
     }
 
+    const weight = normalizeQuestionWeight(q.weight);
+
     answerRecords[currentIndex] = {
       questionIndex: currentIndex,
+      questionId: q.id || `Q${String(currentIndex + 1).padStart(2, "0")}`,
       dimension: q.dimension,
-      rawValue,
+      polarity: q.polarity || inferQuestionPolarity(q),
+      rawValue: rawScore,
+      rawLabel: getAnswerLabelByValue(rawScore),
       score,
+      weightedScore: score * weight,
+      weight,
       reverse: Boolean(q.reverse),
-      text: q.text || ""
+      consistencyPairId: q.consistencyPairId || "",
+      tags: Array.isArray(q.tags) ? q.tags.slice(0, 6) : [],
+      text: q.text || "",
+      answeredAt: now
     };
 
     recalcScores();
@@ -200,7 +222,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         finishTest();
       }
-    }, 300);
+    }, ANSWER_THROTTLE_MS);
   }
 
   // ==================== 上一题 ====================
@@ -225,9 +247,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     answerRecords.forEach((record) => {
       if (!record || !DIMENSION_IDS.includes(record.dimension)) return;
 
-      userScores[record.dimension] += toFiniteNumber(record.score, 0);
-      dimensionCounts[record.dimension] += 1;
+      const weight = normalizeQuestionWeight(record.weight);
+      const baseScore = toFiniteNumber(record.score, 0);
+
+      userScores[record.dimension] += baseScore * weight;
+      dimensionCounts[record.dimension] += weight;
     });
+
+    consistencyReport = calculateConsistencyReport(answerRecords);
   }
 
   // ==================== 完成测试 ====================
@@ -264,7 +291,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     displayResult(matchedHero, userVec, {
       similarity: selected.similarity,
-      topFive
+      topFive,
+      rankedHeroes,
+      consistencyReport
     });
   }
 
@@ -276,7 +305,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return DIMENSION_IDS.map((dimensionId) => {
       const count = dimensionCounts[dimensionId] || 0;
       if (count <= 0) return 0;
-      return clamp(userScores[dimensionId] / count, -2, 2);
+      return clamp(userScores[dimensionId] / count, SCORE_MIN, SCORE_MAX);
     });
   }
 
@@ -302,7 +331,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       synergy
     });
 
+    const activeConsistencyReport = matchInfo.consistencyReport || consistencyReport || createEmptyConsistencyReport();
     const dimensionBarsHtml = buildUserDimensionBars(userVec);
+    const dimensionExplanationHtml = buildDimensionExplanationHtml(userVec);
+    const consistencyWarningHtml = buildConsistencyWarningHtml(activeConsistencyReport);
+    const dominantAdviceHtml = buildDominantAdviceHtml(userVec);
+    const roleAdviceHtml = buildRoleAdviceHtml(hero);
     const topFiveHtml = buildTopFiveHtml(matchInfo.topFive || []);
     const storyExcerpt = getStoryExcerpt(hero.story);
     const heroQuote = getHeroQuote(hero);
@@ -337,6 +371,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </div>
 
+        ${consistencyWarningHtml}
+
         <div class="result-section" style="margin-top: 1rem;">
           <h3 style="font-size: 1.05rem; color: #e9f1f7; margin-bottom: 0.8rem;">人格解读</h3>
           <p style="color: #c0cfdf; line-height: 1.8;">
@@ -347,6 +383,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="result-section" style="margin-top: 1.2rem;">
           <h3 style="font-size: 1.05rem; color: #e9f1f7; margin-bottom: 0.8rem;">你的五维画像</h3>
           ${dimensionBarsHtml}
+          ${dimensionExplanationHtml}
         </div>
 
         <div class="result-section" style="margin-top: 1.2rem;">
@@ -369,6 +406,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${topFiveHtml}
         </div>
 
+        ${dominantAdviceHtml}
+        ${roleAdviceHtml}
+
         <div class="result-section" style="margin-top: 1.2rem;">
           <p style="color: #c0cfdf; line-height: 1.8;">
             ${escapeHTML(templates.defaultAdvice || "在符文之地继续你的冒险吧！")}
@@ -390,7 +430,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const shareBtn = document.getElementById("share-result-btn");
 
     if (restartBtn) {
-      restartBtn.addEventListener("click", () => resetTest(true));
+      restartBtn.addEventListener("click", () => confirmAndResetTest());
     }
 
     if (shareBtn) {
@@ -492,7 +532,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const value = toFiniteNumber(userVec[index], 0);
       const meta = getDimensionMeta(dimensionId);
       const label = meta?.name || dimensionId;
-      const percent = ((value + 2) / 4) * 100;
+      const band = getScoreBand(dimensionId, value);
+      const percent = ((value - SCORE_MIN) / (SCORE_MAX - SCORE_MIN)) * 100;
 
       return `
         <div class="dimension-item">
@@ -500,12 +541,143 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="dim-bar-bg">
             <div class="dim-bar-fill" style="width: ${clamp(percent, 0, 100)}%;"></div>
           </div>
-          <div class="dim-value">${value.toFixed(2)}</div>
+          <div class="dim-value" title="${escapeAttribute(band.label)}">${value.toFixed(2)}</div>
         </div>
       `;
     }).join("");
 
     return `<div class="dimension-bars">${items}</div>`;
+  }
+
+  function buildDimensionExplanationHtml(userVec) {
+    const templates = window.resultTemplates || {};
+    const explanations = templates.dimensionExplanations || {};
+
+    const items = DIMENSION_IDS.map((dimensionId, index) => {
+      const value = toFiniteNumber(userVec[index], 0);
+      const meta = getDimensionMeta(dimensionId);
+      const band = getScoreBand(dimensionId, value);
+      const directionKey = getDirectionKey(value);
+      const text = explanations?.[dimensionId]?.[directionKey]
+        || getFallbackDimensionExplanation(meta, value);
+
+      const leftLabel = meta?.lowLabel || "低分倾向";
+      const rightLabel = meta?.highLabel || "高分倾向";
+      const tendency = value > 0.5
+        ? `更接近「${rightLabel}」`
+        : value < -0.5
+          ? `更接近「${leftLabel}」`
+          : `处在「${leftLabel}」与「${rightLabel}」之间`;
+
+      return `
+        <div class="dimension-explanation-item" style="padding: 0.85rem 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; justify-content: space-between; gap: 0.8rem; align-items: center; margin-bottom: 0.35rem;">
+            <strong style="color: #e9f1f7;">${escapeHTML(meta?.name || dimensionId)}</strong>
+            <span style="color: #e2b86b; font-size: 0.78rem; white-space: nowrap;">${escapeHTML(band.label)}</span>
+          </div>
+          <p style="color: #c0cfdf; line-height: 1.75; margin: 0;">
+            ${escapeHTML(tendency)}。${escapeHTML(text)}
+          </p>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div id="dimension-explanation" class="dimension-explanation" style="margin-top: 1rem; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 0.2rem 0.9rem;">
+        ${items}
+      </div>
+    `;
+  }
+
+  function getFallbackDimensionExplanation(meta, value) {
+    if (!meta) return "该维度代表你在游戏行为中的稳定倾向。";
+
+    if (value > 0.5) return meta.highDesc || "你更偏向该维度的高分侧行为。";
+    if (value < -0.5) return meta.lowDesc || "你更偏向该维度的低分侧行为。";
+
+    return `你会在「${meta.lowLabel || "低分侧"}」和「${meta.highLabel || "高分侧"}」之间切换，具体表现取决于英雄、阵容和局势。`;
+  }
+
+  function buildConsistencyWarningHtml(report) {
+    if (!report || !report.shouldWarn) return "";
+
+    const template = window.resultTemplates?.consistencyWarning || {};
+    const title = template.title || "答案一致性提醒";
+    const message = report.level === "strong"
+      ? (template.strong || report.warningText)
+      : (template.soft || report.warningText);
+
+    const detailItems = (report.details || []).slice(0, 3).map((item) => {
+      const dimensionMeta = getDimensionMeta(item.dimension);
+      return `
+        <li style="margin-top: 0.35rem; color: #c0cfdf; line-height: 1.65;">
+          ${escapeHTML(dimensionMeta?.name || item.dimension || "相关维度")}：${escapeHTML(item.reason || "两道相反题选择方向接近。")}
+        </li>
+      `;
+    }).join("");
+
+    return `
+      <div class="consistency-warning" style="margin-top: 1rem; padding: 1rem; border-radius: 16px; border: 1px solid rgba(255,107,107,0.42); background: rgba(255,107,107,0.08);">
+        <div style="display: flex; justify-content: space-between; gap: 0.8rem; align-items: center; margin-bottom: 0.45rem;">
+          <h3 style="font-size: 1rem; color: #ffb4b4; margin: 0;">⚠️ ${escapeHTML(title)}</h3>
+          <span style="color: #ffb4b4; font-size: 0.78rem; white-space: nowrap;">一致性 ${report.consistencyScore}%</span>
+        </div>
+        <p style="color: #f0c7c7; line-height: 1.75; margin: 0;">${escapeHTML(message)}</p>
+        ${detailItems ? `<ul style="margin: 0.55rem 0 0 1.1rem; padding: 0;">${detailItems}</ul>` : ""}
+      </div>
+    `;
+  }
+
+  function buildDominantAdviceHtml(userVec) {
+    const dominant = getDominantUserDimension(userVec);
+    const adviceMap = window.resultTemplates?.resultAdviceByDominantDimension || {};
+
+    if (!dominant || dominant.absValue < 0.5) return "";
+
+    const key = `${dominant.id}_${dominant.value >= 0 ? "high" : "low"}`;
+    const advice = adviceMap[key];
+    if (!advice) return "";
+
+    const meta = getDimensionMeta(dominant.id);
+    return `
+      <div class="result-section" style="margin-top: 1.2rem;">
+        <h3 style="font-size: 1.05rem; color: #e9f1f7; margin-bottom: 0.8rem;">主导倾向建议</h3>
+        <p style="color: #c0cfdf; line-height: 1.8;">
+          你最鲜明的维度是「${escapeHTML(meta?.name || dominant.id)}」。${escapeHTML(advice)}
+        </p>
+      </div>
+    `;
+  }
+
+  function buildRoleAdviceHtml(hero) {
+    const roles = Array.isArray(hero?.roles) ? hero.roles : [];
+    const roleDescriptions = window.resultTemplates?.roleDescriptions || {};
+    const roleSuggestions = window.resultTemplates?.roleSuggestions || {};
+
+    const items = roles.slice(0, 2).map((role) => {
+      const desc = roleDescriptions[role];
+      const suggestions = Array.isArray(roleSuggestions[role]) ? roleSuggestions[role].slice(0, 2) : [];
+      if (!desc && suggestions.length === 0) return "";
+
+      return `
+        <div style="padding: 0.85rem 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+          <strong style="color: #e2b86b;">${escapeHTML(getRoleLabel(role))}</strong>
+          ${desc ? `<p style="color: #c0cfdf; line-height: 1.75; margin: 0.35rem 0 0;">${escapeHTML(desc)}</p>` : ""}
+          ${suggestions.length ? `<ul style="margin: 0.45rem 0 0 1.1rem; padding: 0; color: #8d9db0; line-height: 1.7;">${suggestions.map((text) => `<li>${escapeHTML(text)}</li>`).join("")}</ul>` : ""}
+        </div>
+      `;
+    }).join("");
+
+    if (!items.trim()) return "";
+
+    return `
+      <div class="result-section" style="margin-top: 1.2rem;">
+        <h3 style="font-size: 1.05rem; color: #e9f1f7; margin-bottom: 0.8rem;">匹配英雄打法建议</h3>
+        <div style="background: rgba(255,255,255,0.035); border-radius: 16px; padding: 0.15rem 0.9rem;">
+          ${items}
+        </div>
+      </div>
+    `;
   }
 
   function buildUserTags(userVec) {
@@ -574,6 +746,194 @@ document.addEventListener("DOMContentLoaded", async () => {
     return best;
   }
 
+  // ==================== 答案一致性与计分辅助 ====================
+  function normalizeQuestionWeight(value) {
+    const weight = toFiniteNumber(value, 1);
+    if (weight <= 0) return 1;
+    return clamp(weight, 0.25, 3);
+  }
+
+  function inferQuestionPolarity(question) {
+    if (question?.polarity === "high" || question?.polarity === "low") {
+      return question.polarity;
+    }
+    return question?.reverse ? "high" : "low";
+  }
+
+  function getAnswerLabelByValue(value) {
+    const option = ANSWER_OPTIONS.find((item) => item.value === Number(value));
+    return option?.label || "未选择";
+  }
+
+  function createEmptyConsistencyReport() {
+    return {
+      enabled: false,
+      answeredPairs: 0,
+      contradictionCount: 0,
+      strongContradictionCount: 0,
+      consistencyScore: 100,
+      shouldWarn: false,
+      level: "ok",
+      details: [],
+      warningText: "部分答案可能存在矛盾，建议重新测试。"
+    };
+  }
+
+  function calculateConsistencyReport(records) {
+    const meta = window.questionMeta?.consistency || {};
+    const enabled = meta.enabled !== false;
+    const pairs = getConsistencyPairs(meta);
+
+    if (!enabled || pairs.length === 0) {
+      return createEmptyConsistencyReport();
+    }
+
+    const report = {
+      ...createEmptyConsistencyReport(),
+      enabled: true,
+      warningText: meta.suggestedWarningText || "部分答案之间存在明显矛盾，结果可能不够稳定。建议重新测试。"
+    };
+
+    const recordMap = buildAnswerRecordMap(records);
+    const strongAbs = Math.max(
+      CONSISTENCY_SIGNIFICANT_RAW_ABS,
+      toFiniteNumber(meta.strongContradictionRawAbs, 2)
+    );
+
+    pairs.forEach((pair) => {
+      const lowRecord = recordMap.get(pair.lowQuestionId);
+      const highRecord = recordMap.get(pair.highQuestionId);
+
+      if (!lowRecord || !highRecord) return;
+
+      const lowRaw = toFiniteNumber(lowRecord.rawValue, 0);
+      const highRaw = toFiniteNumber(highRecord.rawValue, 0);
+
+      if (Math.abs(lowRaw) < CONSISTENCY_SIGNIFICANT_RAW_ABS || Math.abs(highRaw) < CONSISTENCY_SIGNIFICANT_RAW_ABS) {
+        return;
+      }
+
+      report.answeredPairs += 1;
+
+      const sameAgreeDirection = lowRaw < 0 && highRaw < 0;
+      const sameRejectDirection = lowRaw > 0 && highRaw > 0;
+      const contradicted = sameAgreeDirection || sameRejectDirection;
+
+      if (!contradicted) return;
+
+      const isStrong = Math.abs(lowRaw) >= strongAbs && Math.abs(highRaw) >= strongAbs;
+      report.contradictionCount += 1;
+      if (isStrong) report.strongContradictionCount += 1;
+
+      report.details.push({
+        id: pair.id,
+        dimension: pair.dimension,
+        reason: pair.reason,
+        lowQuestionId: pair.lowQuestionId,
+        highQuestionId: pair.highQuestionId,
+        lowAnswer: lowRecord.rawLabel || getAnswerLabelByValue(lowRaw),
+        highAnswer: highRecord.rawLabel || getAnswerLabelByValue(highRaw),
+        strong: isStrong
+      });
+    });
+
+    if (report.answeredPairs > 0) {
+      report.consistencyScore = Math.max(
+        0,
+        Math.round((1 - report.contradictionCount / report.answeredPairs) * 100)
+      );
+    }
+
+    const minAnsweredPairs = Math.max(1, toFiniteNumber(meta.minAnsweredPairs, 3));
+    const contradictionThreshold = Math.max(1, toFiniteNumber(meta.contradictionThreshold, 3));
+
+    report.shouldWarn = report.answeredPairs >= minAnsweredPairs
+      && (
+        report.contradictionCount >= contradictionThreshold
+        || report.strongContradictionCount >= Math.max(2, Math.ceil(contradictionThreshold / 2))
+      );
+
+    report.level = report.strongContradictionCount >= 2 || report.contradictionCount >= contradictionThreshold
+      ? "strong"
+      : report.contradictionCount > 0
+        ? "soft"
+        : "ok";
+
+    return report;
+  }
+
+  function buildAnswerRecordMap(records) {
+    const map = new Map();
+
+    (records || []).forEach((record) => {
+      if (!record) return;
+      const question = window.questions?.[record.questionIndex];
+      const id = record.questionId || question?.id;
+      if (!id) return;
+
+      map.set(id, {
+        ...record,
+        questionId: id,
+        rawLabel: record.rawLabel || getAnswerLabelByValue(record.rawValue)
+      });
+    });
+
+    return map;
+  }
+
+  function getConsistencyPairs(meta) {
+    if (Array.isArray(meta?.pairs) && meta.pairs.length > 0) {
+      return meta.pairs
+        .map(normalizeConsistencyPair)
+        .filter(Boolean);
+    }
+
+    return buildConsistencyPairsFromQuestions();
+  }
+
+  function normalizeConsistencyPair(pair) {
+    if (!pair || !pair.lowQuestionId || !pair.highQuestionId) return null;
+
+    return {
+      id: pair.id || `${pair.lowQuestionId}__${pair.highQuestionId}`,
+      dimension: pair.dimension || "",
+      lowQuestionId: pair.lowQuestionId,
+      highQuestionId: pair.highQuestionId,
+      relation: pair.relation || "opposite",
+      reason: pair.reason || "两道相反题的回答方向接近。"
+    };
+  }
+
+  function buildConsistencyPairsFromQuestions() {
+    const groups = new Map();
+
+    (window.questions || []).forEach((question) => {
+      if (!question?.consistencyPairId) return;
+      if (!groups.has(question.consistencyPairId)) {
+        groups.set(question.consistencyPairId, []);
+      }
+      groups.get(question.consistencyPairId).push(question);
+    });
+
+    const pairs = [];
+    groups.forEach((items, id) => {
+      const low = items.find((item) => inferQuestionPolarity(item) === "low");
+      const high = items.find((item) => inferQuestionPolarity(item) === "high");
+      if (!low || !high) return;
+
+      pairs.push({
+        id,
+        dimension: low.dimension || high.dimension || "",
+        lowQuestionId: low.id,
+        highQuestionId: high.id,
+        relation: "opposite",
+        reason: "这两道题分别描述同一维度的低分侧与高分侧行为。"
+      });
+    });
+
+    return pairs;
+  }
+
   // ==================== 进度保存与恢复 ====================
   function saveProgress() {
     const payload = {
@@ -582,6 +942,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       userScores,
       dimensionCounts,
       answerRecords,
+      consistencyReport,
       totalQuestions,
       savedAt: Date.now()
     };
@@ -664,6 +1025,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     dimensionCounts = createEmptyDimensionMap();
     answerRecords = [];
     isAnswering = false;
+    lastAnswerTime = 0;
+    consistencyReport = createEmptyConsistencyReport();
 
     clearProgress();
     hideResult();
@@ -672,6 +1035,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (shouldScrollTop) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  }
+
+  function confirmAndResetTest() {
+    const confirmed = window.confirm("重新测试将丢失当前所有答案，确定吗？");
+    if (!confirmed) return;
+    resetTest(true);
   }
 
   // ==================== 分享 ====================
@@ -766,11 +1135,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showError(message) {
+    if (typeof window.showUserError === "function") {
+      window.showUserError(message);
+    }
+
     if (!questionArea) return;
 
     questionArea.style.display = "block";
     questionArea.innerHTML = `
-      <div style="text-align: center;">
+      <div class="mgti-error-card" style="text-align: center;">
         <div style="font-size: 2rem; margin-bottom: 0.8rem;">⚠️</div>
         <h2 style="margin-bottom: 0.8rem;">加载失败</h2>
         <p style="color: #c0cfdf; line-height: 1.8;">${escapeHTML(message)}</p>
@@ -852,6 +1225,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     return (window.dimensions || []).find((item) => item.id === dimensionId) || null;
   }
 
+  function getScoreBand(dimensionId, value) {
+    const number = toFiniteNumber(value, 0);
+    const meta = getDimensionMeta(dimensionId);
+    const bands = Array.isArray(meta?.scoreBands) ? meta.scoreBands : [];
+
+    const matched = bands.find((band) => {
+      const min = toFiniteNumber(band.min, SCORE_MIN);
+      const max = toFiniteNumber(band.max, SCORE_MAX);
+      return number >= min && number <= max;
+    });
+
+    if (matched) {
+      return {
+        label: matched.label || getFallbackScoreBandLabel(number),
+        desc: matched.desc || ""
+      };
+    }
+
+    return {
+      label: getFallbackScoreBandLabel(number),
+      desc: ""
+    };
+  }
+
+  function getFallbackScoreBandLabel(value) {
+    if (value >= 1.2) return window.resultTemplates?.scoreBandLabels?.veryHigh || "强高分倾向";
+    if (value >= 0.4) return window.resultTemplates?.scoreBandLabels?.high || "偏高分倾向";
+    if (value <= -1.2) return window.resultTemplates?.scoreBandLabels?.veryLow || "强低分倾向";
+    if (value <= -0.4) return window.resultTemplates?.scoreBandLabels?.low || "偏低分倾向";
+    return window.resultTemplates?.scoreBandLabels?.neutral || "均衡倾向";
+  }
+
+  function getDirectionKey(value) {
+    if (value > 0.5) return "high";
+    if (value < -0.5) return "low";
+    return "mid";
+  }
+
+  function getRoleLabel(role) {
+    const labels = {
+      assassin: "刺客",
+      fighter: "战士",
+      mage: "法师",
+      marksman: "射手",
+      support: "辅助",
+      tank: "坦克"
+    };
+
+    return labels[role] || role || "未知定位";
+  }
+
   function toFiniteNumber(value, fallback = 0) {
     const number = Number(value);
     return Number.isFinite(number) ? number : fallback;
@@ -887,10 +1311,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       userScores,
       dimensionCounts,
       answerRecords,
-      totalQuestions
+      totalQuestions,
+      consistencyReport,
+      questionMeta: window.questionMeta || null
     }),
+    recalcScores,
     resetTest,
     finishTest,
+    calculateConsistencyReport,
     cosineSimilarity
   };
 });

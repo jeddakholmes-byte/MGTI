@@ -1,0 +1,41 @@
+{
+  "name": "MGTI 英雄联盟五维游戏人格测试",
+  "short_name": "MGTI",
+  "description": "通过 TAC / TEA / EMO / DEC / PRE 五维画像匹配你的英雄联盟本命英雄。",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070a11",
+  "theme_color": "#0a0c14",
+  "categories": ["games", "entertainment", "lifestyle"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始测试",
+      "short_name": "测试",
+      "url": "./index.html",
+      "description": "开始 MGTI 五维游戏人格测试"
+    },
+    {
+      "name": "英雄图鉴",
+      "short_name": "图鉴",
+      "url": "./catalog.html",
+      "description": "浏览英雄 MGTI 五维画像"
+    }
+  ]
+}

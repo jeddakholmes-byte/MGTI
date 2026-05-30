@@ -1,105 +1,405 @@
 {
-  "version": "1.0",
+  "version": "2.0",
+  "schema": "MGTI_QUESTIONS_V2",
+  "scoring": {
+    "scale": [
+      {
+        "label": "非常同意",
+        "rawValue": -2
+      },
+      {
+        "label": "比较同意",
+        "rawValue": -1
+      },
+      {
+        "label": "说不清",
+        "rawValue": 0
+      },
+      {
+        "label": "比较不同意",
+        "rawValue": 1
+      },
+      {
+        "label": "非常不同意",
+        "rawValue": 2
+      }
+    ],
+    "compatibilityNote": "当前 test.js 使用 rawValue 计分。reverse=false 表示题干描述低分倾向；reverse=true 表示题干描述高分倾向，前端会将 rawValue 取反。因此本文件保留 text/dimension/reverse 三个必需字段，新增 id/polarity/consistencyPairId 等字段不会破坏现有代码。",
+    "scoreMeaning": {
+      "negative": "更接近该维度 lowLabel",
+      "positive": "更接近该维度 highLabel"
+    }
+  },
+  "consistency": {
+    "enabled": true,
+    "minAnsweredPairs": 3,
+    "contradictionThreshold": 3,
+    "strongContradictionRawAbs": 2,
+    "suggestedWarningText": "部分答案之间存在明显矛盾，结果可能不够稳定。建议重新测试，或按真实游戏习惯作答。",
+    "pairs": [
+      {
+        "id": "TAC-C1",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L1",
+        "highQuestionId": "TAC-H1",
+        "relation": "opposite",
+        "reason": "一个强调不记冷却、凭手感行动；一个强调主动记录关键技能时间。"
+      },
+      {
+        "id": "TAC-C2",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L2",
+        "highQuestionId": "TAC-H2",
+        "relation": "opposite",
+        "reason": "一个强调临场即兴；一个强调提前设计兵线和资源节奏。"
+      },
+      {
+        "id": "TEA-C1",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L1",
+        "highQuestionId": "TEA-H1",
+        "relation": "opposite",
+        "reason": "一个强调边路个人突破；一个强调牺牲发育支援团队。"
+      },
+      {
+        "id": "TEA-C2",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L2",
+        "highQuestionId": "TEA-H2",
+        "relation": "opposite",
+        "reason": "一个强调自己拿资源打穿；一个强调保护核心输出。"
+      },
+      {
+        "id": "EMO-C1",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L1",
+        "highQuestionId": "EMO-H1",
+        "relation": "opposite",
+        "reason": "一个强调被单杀后止损；一个强调被单杀后马上想打回来。"
+      },
+      {
+        "id": "EMO-C2",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L2",
+        "highQuestionId": "EMO-H2",
+        "relation": "opposite",
+        "reason": "一个强调优势时稳拿资源；一个强调优势时继续越塔追击。"
+      },
+      {
+        "id": "DEC-C1",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L1",
+        "highQuestionId": "DEC-H1",
+        "relation": "opposite",
+        "reason": "一个强调等队友和视野到位；一个强调看到窗口立刻强开。"
+      },
+      {
+        "id": "DEC-C2",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L2",
+        "highQuestionId": "DEC-H2",
+        "relation": "opposite",
+        "reason": "一个强调放弃不确定机会；一个强调短窗口内立即赌一波。"
+      },
+      {
+        "id": "PRE-C1",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L1",
+        "highQuestionId": "PRE-H1",
+        "relation": "opposite",
+        "reason": "一个强调稳定传统角色；一个强调高风险高上限英雄。"
+      },
+      {
+        "id": "PRE-C2",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L2",
+        "highQuestionId": "PRE-H2",
+        "relation": "opposite",
+        "reason": "一个强调清晰职责；一个强调机制复杂与个人秀。"
+      }
+    ],
+    "futureImplementationHint": "若一对 opposite 题目 rawValue 同号且绝对值均 >= 1，可记为 1 次矛盾；若绝对值均为 2，可记为强矛盾。"
+  },
   "questions": [
     {
-      "text": "我很少计算对方技能冷却，全靠感觉打。",
+      "id": "TAC-L1",
+      "text": "我更相信临场手感，很少刻意记录对方闪现、净化或关键大招的时间。",
       "dimension": "TAC",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C1",
+      "tags": [
+        "冷却",
+        "手感",
+        "对线"
+      ]
     },
     {
-      "text": "我会在脑中模拟对线换血的收益再动手。",
+      "id": "TAC-H1",
+      "text": "对方交出关键技能后，我会记住大致时间，并围绕下一波窗口设计击杀或压制。",
       "dimension": "TAC",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C1",
+      "tags": [
+        "冷却",
+        "规划",
+        "击杀窗口"
+      ]
     },
     {
-      "text": "比起操作，我更看重意识和宏观决策。",
+      "id": "TAC-L2",
+      "text": "我经常在没有完整计划的情况下先动手，再靠操作和反应把局面打回来。",
       "dimension": "TAC",
-      "reverse": true
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C2",
+      "tags": [
+        "即兴",
+        "反应",
+        "操作"
+      ]
     },
     {
-      "text": "我经常凭本能打出惊人的操作。",
+      "id": "TAC-H2",
+      "text": "动手前我通常会先想兵线位置、打野可能路线、技能命中率和后续资源收益。",
       "dimension": "TAC",
-      "reverse": false
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C2",
+      "tags": [
+        "兵线",
+        "资源",
+        "宏观"
+      ]
     },
     {
-      "text": "我更享受独自带穿一条路，而不是跟团。",
+      "id": "TEA-L1",
+      "text": "我更享受一个人把边路带穿，哪怕正面团战暂时少一个人。",
       "dimension": "TEA",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C1",
+      "tags": [
+        "单带",
+        "边路",
+        "牵制"
+      ]
     },
     {
-      "text": "只要团战需要，我可以放弃自己的发育去支援。",
+      "id": "TEA-H1",
+      "text": "只要团队节奏需要，我可以放弃一波兵线或野怪，提前去小龙、先锋或河道站位。",
       "dimension": "TEA",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C1",
+      "tags": [
+        "支援",
+        "资源团",
+        "站位"
+      ]
     },
     {
-      "text": "我是个可靠的队友，总在关键时刻支援。",
+      "id": "TEA-L2",
+      "text": "如果我拿到优势，我更希望资源继续给我，让我自己打穿比赛。",
       "dimension": "TEA",
-      "reverse": true
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C2",
+      "tags": [
+        "资源",
+        "个人 carry",
+        "滚雪球"
+      ]
     },
     {
-      "text": "我喜欢一个人单打独斗，不需要队友帮忙。",
+      "id": "TEA-H2",
+      "text": "团战里我会优先看队友位置和核心输出安全，而不是只盯着自己能不能收割。",
       "dimension": "TEA",
-      "reverse": false
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C2",
+      "tags": [
+        "保护",
+        "团战",
+        "协作"
+      ]
     },
     {
-      "text": "逆风时我会忍不住发起投降。",
+      "id": "EMO-L1",
+      "text": "被单杀或被抓以后，我通常会先补视野、控兵线和止损，而不是急着打回来。",
       "dimension": "EMO",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C1",
+      "tags": [
+        "抗压",
+        "止损",
+        "心态"
+      ]
     },
     {
-      "text": "无论优势劣势，我都能保持冷静操作。",
+      "id": "EMO-H1",
+      "text": "被单杀、被亮表情或被针对以后，我很容易想立刻找机会把场子打回来。",
       "dimension": "EMO",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C1",
+      "tags": [
+        "上头",
+        "报复",
+        "对抗"
+      ]
     },
     {
-      "text": "我激情四射，打起来容易上头。",
+      "id": "EMO-L2",
+      "text": "优势时我也能稳住节奏，优先拿塔、视野和地图资源，不会只追求人头。",
       "dimension": "EMO",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C2",
+      "tags": [
+        "优势",
+        "运营",
+        "稳定"
+      ]
     },
     {
-      "text": "被单杀后我能迅速调整心态重新出发。",
+      "id": "EMO-H2",
+      "text": "一旦打出优势，我会越打越凶，看到能追的人就很难收手。",
       "dimension": "EMO",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C2",
+      "tags": [
+        "追击",
+        "滚雪球",
+        "高波动"
+      ]
     },
     {
-      "text": "看到残血我就忍不住闪现追，不管有没有视野。",
+      "id": "DEC-L1",
+      "text": "开团前我更愿意等队友技能、位置和视野都到位，不喜欢一个人先冲。",
       "dimension": "DEC",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C1",
+      "tags": [
+        "谨慎",
+        "开团",
+        "视野"
+      ]
     },
     {
-      "text": "我会等到队友到位再开团，绝不一个人上。",
+      "id": "DEC-H1",
+      "text": "只要看到对方 C 位走位失误，我会立刻闪现或位移开团，不想错过窗口。",
       "dimension": "DEC",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C1",
+      "tags": [
+        "果断",
+        "强开",
+        "窗口"
+      ]
     },
     {
-      "text": "机会出现时我绝不犹豫，立刻发起进攻。",
+      "id": "DEC-L2",
+      "text": "如果一次击杀机会不够确定，我宁愿放弃，换取更稳的兵线、视野或资源。",
       "dimension": "DEC",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C2",
+      "tags": [
+        "风险控制",
+        "资源",
+        "后手"
+      ]
     },
     {
-      "text": "我在动手前会充分评估风险和收益。",
+      "id": "DEC-H2",
+      "text": "我能接受先手失败的风险，因为很多机会只出现一瞬间，犹豫就没了。",
       "dimension": "DEC",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C2",
+      "tags": [
+        "风险",
+        "瞬间决策",
+        "先手"
+      ]
     },
     {
-      "text": "我喜欢玩刺客或战士，享受秒人的快感。",
+      "id": "PRE-L1",
+      "text": "我更喜欢女警、发条、布隆这类定位清楚、打法稳定、职责明确的英雄。",
       "dimension": "PRE",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C1",
+      "tags": [
+        "传统",
+        "稳定",
+        "模板"
+      ]
     },
     {
-      "text": "我习惯玩射手或法师，在安全位置输出。",
+      "id": "PRE-H1",
+      "text": "我会被亚索、薇恩、劫、阿卡丽这类高风险高上限英雄吸引，即使更容易失误。",
       "dimension": "PRE",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C1",
+      "tags": [
+        "高上限",
+        "高风险",
+        "操作"
+      ]
     },
     {
-      "text": "我倾向于选择风险高但收益大的英雄。",
+      "id": "PRE-L2",
+      "text": "选英雄时，我更在意阵容职责是否清楚、输出位置是否安全、容错率是否足够。",
       "dimension": "PRE",
-      "reverse": false
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C2",
+      "tags": [
+        "阵容",
+        "容错",
+        "安全输出"
+      ]
     },
     {
-      "text": "我更喜欢稳健输出的传统角色。",
+      "id": "PRE-H2",
+      "text": "我愿意为了机制复杂、极限拉扯或个人秀空间，选择更难驾驭的英雄。",
       "dimension": "PRE",
-      "reverse": true
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C2",
+      "tags": [
+        "机制",
+        "拉扯",
+        "个人秀"
+      ]
     }
   ]
 }

@@ -3,18 +3,38 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <meta name="description"
     content="英雄联盟 MGTI 英雄图鉴 - 基于 My Game Type Indicator 五维游戏人格体系，探索符文之地英雄的战术风格、团队角色、情绪反应、决策速度与英雄偏好。">
-  <meta name="keywords" content="英雄联盟,MGTI,My Game Type Indicator,人格测试,英雄图鉴,本命英雄,符文之地,游戏人格">
+  <meta name="keywords" content="英雄联盟,MGTI,My Game Type Indicator,人格测试,英雄图鉴,本命英雄,符文之地,游戏人格,LOL英雄图鉴,英雄风格筛选">
+  <meta name="author" content="MGTI Project">
+  <meta name="robots" content="index,follow">
   <meta name="theme-color" content="#0a0c14">
+  <meta name="color-scheme" content="dark light">
+  <meta name="format-detection" content="telephone=no">
 
+  <meta property="og:site_name" content="MGTI · My Game Type Indicator">
   <meta property="og:title" content="英雄图鉴 · MGTI · 探索人格与英雄的共鸣">
-  <meta property="og:description" content="查看英雄联盟英雄的 MGTI 五维人格画像，探索每位英雄的游戏风格与人格倾向。">
+  <meta property="og:description" content="查看英雄联盟英雄的 MGTI 五维人格画像，按 TAC / TEA / EMO / DEC / PRE 筛选英雄风格。">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:url" content="/MGTI/catalog.html">
+  <meta property="og:image" content="/MGTI/assets/og/mgti-og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="MGTI 英雄联盟五维英雄图鉴封面图">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MGTI · 英雄图鉴">
+  <meta name="twitter:description" content="查看英雄五维画像，筛选与你风格接近的英雄。">
+  <meta name="twitter:image" content="/MGTI/assets/og/mgti-og.png">
 
   <title>英雄图鉴 · MGTI · 探索人格与英雄的共鸣</title>
 
+  <link rel="canonical" href="/MGTI/catalog.html">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="stylesheet" href="frontend/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,29 +42,54 @@
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap"
     rel="stylesheet">
 
+  <script src="frontend/js/config.js" defer></script>
   <script src="frontend/js/data.js" defer></script>
   <script src="frontend/js/catalog.js" defer></script>
 </head>
 
-<body>
+<body data-page="catalog">
   <div class="app-container catalog-page">
     <header class="catalog-header">
       <h1>⚔️ 英雄图鉴</h1>
       <div class="mgti-subtitle">My Game Type Indicator</div>
-      <p>探索符文之地的 MGTI 五维人格图谱 · 点击英雄卡片查看深度风格解析</p>
+      <p>
+        探索符文之地的 MGTI 五维人格图谱 · 点击英雄卡片查看深度风格解析
+        <span class="result-count" aria-live="polite"></span>
+      </p>
 
-      <div class="filter-bar">
+      <div class="filter-bar" role="search" aria-label="英雄筛选与排序">
         <input type="text" id="search-input" class="search-input" placeholder="搜索英雄名称或别称（如：亚索、EZ、盲僧、劫）..."
-          autocomplete="off" aria-label="搜索英雄名称或别称">
+          autocomplete="off" aria-label="搜索英雄名称或别称" inputmode="search">
 
         <select id="sort-filter" class="sort-filter" aria-label="选择英雄排序维度">
           <option value="default">默认排序</option>
+          <option value="dominant">风格鲜明度</option>
           <option value="TAC">战术风格</option>
           <option value="TEA">团队角色</option>
           <option value="EMO">情绪反应</option>
           <option value="DEC">决策速度</option>
           <option value="PRE">英雄偏好</option>
         </select>
+
+        <select id="dim-filter" class="dim-filter sort-filter" aria-label="按 MGTI 维度倾向筛选英雄">
+          <option value="all">全部英雄</option>
+          <option value="balanced">五维均衡型</option>
+          <option value="extreme">风格鲜明型</option>
+          <option value="TAC_high">战术风格｜谋略型 &gt; +0.5</option>
+          <option value="TAC_low">战术风格｜直觉型 &lt; -0.5</option>
+          <option value="TEA_high">团队角色｜团队核心 &gt; +0.5</option>
+          <option value="TEA_low">团队角色｜独行侠 &lt; -0.5</option>
+          <option value="EMO_high">情绪反应｜激情型 &gt; +0.5</option>
+          <option value="EMO_low">情绪反应｜冷静型 &lt; -0.5</option>
+          <option value="DEC_high">决策速度｜果敢型 &gt; +0.5</option>
+          <option value="DEC_low">决策速度｜谨慎型 &lt; -0.5</option>
+          <option value="PRE_high">英雄偏好｜高风险型 &gt; +0.5</option>
+          <option value="PRE_low">英雄偏好｜传统型 &lt; -0.5</option>
+        </select>
+      </div>
+
+      <div class="catalog-hint" style="margin-top: 0.9rem; color: #8d9db0; font-size: 0.85rem; line-height: 1.6;">
+        支持按英雄名、称号、常用别称搜索。维度筛选可以快速找到“高谋略”“强团队”“高操作风险”等风格英雄。
       </div>
     </header>
 
@@ -54,7 +99,7 @@
       </section>
 
       <div class="back-home">
-        <a href="index.html" class="btn-primary">← 返回人格测试</a>
+        <a href="index.html" class="btn-primary" data-track="back_to_test">← 返回人格测试</a>
       </div>
     </main>
 
@@ -69,6 +114,19 @@
       本页面需要启用 JavaScript 才能加载英雄图鉴。
     </div>
   </noscript>
+
+  <script>
+    (function registerMGTIServiceWorker() {
+      if (!("serviceWorker" in navigator)) return;
+      if (window.location.protocol === "file:") return;
+
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js").catch(function (error) {
+          console.warn("[MGTI] Service Worker 注册失败：", error);
+        });
+      });
+    })();
+  </script>
 </body>
 
 </html>
