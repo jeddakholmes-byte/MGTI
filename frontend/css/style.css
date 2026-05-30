@@ -1996,3 +1996,105 @@ body #question-area .choice-gate-actions {
     font-size: 0.86rem !important;
   }
 }
+
+/* ==================== Answer State Fix v5.1 · Anti Sticky Highlight ==================== */
+/* 只允许 .is-selected / aria-pressed=true 表示“已选择”。hover 与 focus 只做轻提示，避免下一题误以为已选。 */
+body #question-area .option-btn {
+  position: relative !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+body #question-area .option-btn:not(.is-selected):not([aria-pressed="true"]) {
+  color: #e8f0fb !important;
+}
+
+body #question-area .option-btn:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body #question-area .option-btn:focus-visible:not(.is-selected):not([aria-pressed="true"]) {
+  background: rgba(255, 255, 255, 0.065) !important;
+  border-color: rgba(226, 184, 107, 0.34) !important;
+  box-shadow: 0 0 0 3px rgba(226, 184, 107, 0.12) !important;
+  transform: none !important;
+}
+
+body #question-area .option-btn.is-selected,
+body #question-area .option-btn[aria-pressed="true"] {
+  background:
+    linear-gradient(135deg, rgba(226, 184, 107, 0.28), rgba(197, 129, 46, 0.20)),
+    rgba(255, 255, 255, 0.055) !important;
+  border-color: rgba(226, 184, 107, 0.88) !important;
+  color: #fff8e8 !important;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(226, 184, 107, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+  transform: translateY(-1px) !important;
+}
+
+body #question-area .option-btn.is-selected::before,
+body #question-area .option-btn[aria-pressed="true"]::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  margin-right: 0.05rem;
+  background: rgba(226, 184, 107, 0.22);
+  color: #ffe5a6;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+body #question-area .option-btn.is-answering {
+  pointer-events: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body #question-area .option-btn:hover:not(.is-selected):not([aria-pressed="true"]) {
+    background: rgba(226, 184, 107, 0.095) !important;
+    border-color: rgba(226, 184, 107, 0.42) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18) !important;
+    transform: translateY(-1px) !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  body #question-area .option-btn:hover:not(.is-selected):not([aria-pressed="true"]),
+  body #question-area .option-btn:active:not(.is-selected):not([aria-pressed="true"]) {
+    background: rgba(255, 255, 255, 0.045) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+body #question-area .option-emoji {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body #question-area .question-card-note,
+body #question-area .question-hint {
+  border-left: 2px solid rgba(226, 184, 107, 0.38);
+  padding-left: 0.75rem;
+}
+
+body #question-area .progress-meta {
+  letter-spacing: 0.01em;
+}

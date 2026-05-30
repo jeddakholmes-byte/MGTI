@@ -1,10 +1,10 @@
 // ==================== MGTI 测试核心逻辑 ====================
 // My Game Type Indicator
-// V4: 保留五维向量匹配算法，增加阶段性选择页。用户完成基础题量后可直接出结果，也可继续答题提高算法覆盖度。
+// V5.1: 修复选项高亮残留与焦点黏滞问题，保留阶段性选择页与匿名答题记录提交。
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const PROGRESS_KEY = "mgti_progress_v4_gate_choice";
-  const PROGRESS_VERSION = "4.0-fixed-choice-gate";
+  const PROGRESS_KEY = "mgti_progress_v5_answer_state_fix";
+  const PROGRESS_VERSION = "5.1-answer-state-fix";
   const DIMENSION_IDS = window.MGTI_DIMENSION_IDS || ["TAC", "TEA", "EMO", "DEC", "PRE"];
   const ANSWER_THROTTLE_MS = 300;
   const SCORE_MIN = -2;
@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentTargetCount = 0;
   let consistencyReport = createEmptyConsistencyReport();
   let lastResultPayload = null;
+  let hasSubmittedAnonymousResult = false;
 
   try {
     showLoading("✨ 正在抽取本局峡谷精神状态题...");
@@ -302,6 +303,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderQuestion() {
     if (!questionArea) return;
+
+    // 关键修复：进入下一题前先清掉上一题的临时视觉状态和浏览器焦点。
+    // 这可以避免移动端 sticky hover / focus 把上一题的高光带到下一题。
+    resetTransientAnswerVisualState();
     hideResult();
 
     // 关键修复：只要已经达到当前阶段题量，就不再继续渲染下一题。
@@ -328,8 +333,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const displayText = getQuestionText(q);
     const hintText = getQuestionHint(q, meta);
 
-    const buttonsHtml = ANSWER_OPTIONS.map((option) => `
-      <button class="option-btn" type="button" data-value="${option.value}" aria-label="${escapeAttribute(option.label)}">
+    const buttonsHtml = ANSWER_OPTIONS.map((option, optionIndex) => `
+      <button
+        class="option-btn"
+        type="button"
+        data-value="${option.value}"
+        data-option-index="${optionIndex}"
+        data-question-index="${currentIndex}"
+        aria-pressed="false"
+        aria-label="${escapeAttribute(option.label)}"
+        autocomplete="off"
+      >
         <span class="option-emoji" aria-hidden="true">${option.emoji}</span>
         <span>${escapeHTML(option.label)}</span>
       </button>
@@ -365,12 +379,65 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
+    clearOptionVisualState();
+    restoreCurrentQuestionAnswerVisualState();
+
     questionArea.querySelectorAll(".option-btn").forEach((button) => {
-      button.addEventListener("click", () => handleAnswer(Number(button.dataset.value)));
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (button.dataset.locked === "true") return;
+        handleAnswer(Number(button.dataset.value));
+      });
     });
 
     const prevButton = document.getElementById("prev-question-btn");
     if (prevButton) prevButton.addEventListener("click", goToPreviousQuestion);
+  }
+
+  function resetTransientAnswerVisualState() {
+    clearOptionVisualState();
+    releaseQuestionFocus();
+  }
+
+  function clearOptionVisualState() {
+    if (!questionArea) return;
+    questionArea.querySelectorAll(".option-btn").forEach((button) => {
+      button.classList.remove("is-selected", "is-answering", "is-ghost-selected");
+      button.dataset.locked = "false";
+      button.setAttribute("aria-pressed", "false");
+      button.removeAttribute("data-selected-value");
+    });
+  }
+
+  function restoreCurrentQuestionAnswerVisualState() {
+    const record = answerRecords[currentIndex];
+    if (!record || !questionArea) return;
+    const button = questionArea.querySelector(`.option-btn[data-value="${String(record.rawValue)}"]`);
+    if (!button) return;
+    button.classList.add("is-selected");
+    button.setAttribute("aria-pressed", "true");
+    button.dataset.selectedValue = String(record.rawValue);
+  }
+
+  function markOptionAsSelected(rawValue) {
+    if (!questionArea) return;
+    const value = String(rawValue);
+    questionArea.querySelectorAll(".option-btn").forEach((button) => {
+      const isSelected = button.dataset.value === value;
+      button.classList.toggle("is-selected", isSelected);
+      button.classList.add("is-answering");
+      button.dataset.locked = "true";
+      button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+      if (isSelected) button.dataset.selectedValue = value;
+      else button.removeAttribute("data-selected-value");
+    });
+  }
+
+  function releaseQuestionFocus() {
+    const active = document.activeElement;
+    if (active && questionArea && questionArea.contains(active) && typeof active.blur === "function") {
+      active.blur();
+    }
   }
 
   function getQuestionText(question) {
@@ -410,6 +477,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     isAnswering = true;
 
     let rawScore = clamp(toFiniteNumber(rawValue, 0), SCORE_MIN, SCORE_MAX);
+    markOptionAsSelected(rawScore);
+    releaseQuestionFocus();
     let score = q.reverse ? -rawScore : rawScore;
     const weight = normalizeQuestionWeight(q.weight);
 
@@ -444,6 +513,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function goToPreviousQuestion() {
     if (currentIndex === 0) return;
+    resetTransientAnswerVisualState();
     currentIndex -= 1;
     delete answerRecords[currentIndex];
     recalcScores();
@@ -484,12 +554,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const selected = topFive[Math.floor(Math.random() * topFive.length)];
     clearProgress();
-    displayResult(selected.hero, userVec, {
+    const resultMeta = {
       similarity: selected.similarity,
       topFive,
       rankedHeroes,
       consistencyReport
-    });
+    };
+
+    displayResult(selected.hero, userVec, resultMeta);
+    submitAnonymousResult(selected.hero, userVec, resultMeta);
   }
 
   function displayResult(hero, userVec, matchInfo = {}) {
@@ -579,6 +652,128 @@ document.addEventListener("DOMContentLoaded", async () => {
       await copyText(buildShareText(hero, funProfile));
       showToast("分享文案已复制。现在去冒犯你的朋友吧。");
     });
+  }
+
+
+  function submitAnonymousResult(hero, userVec, matchInfo = {}) {
+    if (hasSubmittedAnonymousResult) return;
+    hasSubmittedAnonymousResult = true;
+
+    if (!window.MGTIAnalytics || typeof window.MGTIAnalytics.submitSubmission !== "function") {
+      return;
+    }
+
+    const answeredRecords = answerRecords.filter(Boolean);
+    const payload = {
+      testVersion: PROGRESS_VERSION,
+      questionBankVersion: window.questionMeta?.version || window.MGTI_CONFIG?.QUESTION_VERSION || "unknown",
+      resultMode: buildResultMode(answeredRecords.length),
+      questionCount: answeredRecords.length,
+      totalCandidateQuestions: Array.isArray(questionPool) ? questionPool.length : 0,
+      activeQuestionCount: Array.isArray(activeQuestions) ? activeQuestions.length : 0,
+      scores: vectorToScoreMap(userVec),
+      result: buildAnonymousResultPayload(hero, matchInfo),
+      topMatches: buildAnonymousTopMatches(matchInfo.topFive || []),
+      answers: buildAnonymousAnswersPayload(answeredRecords),
+      consistency: sanitizeConsistencyReport(matchInfo.consistencyReport || consistencyReport),
+      progressMeta: buildAnonymousProgressMeta(answeredRecords.length),
+      clientMeta: {
+        page: "index",
+        app: "MGTI"
+      }
+    };
+
+    window.MGTIAnalytics.submitSubmission(payload);
+  }
+
+  function buildResultMode(answeredCount) {
+    const base = getInitialQuestionTarget();
+    const step = getContinueStepCount();
+    if (answeredCount <= base) return "direct_after_base";
+    const extra = Math.max(0, answeredCount - base);
+    const rounds = step > 0 ? Math.ceil(extra / step) : 1;
+    return `direct_after_continue_${rounds}`;
+  }
+
+  function buildAnonymousProgressMeta(answeredCount) {
+    const base = getInitialQuestionTarget();
+    const step = getContinueStepCount();
+    const maxQuestions = activeQuestions.length || questionPool.length || answeredCount;
+    const continued = Math.max(0, answeredCount - base);
+    return {
+      base_question_count: base,
+      continue_step_questions: step,
+      max_questions: maxQuestions,
+      final_question_count: answeredCount,
+      continued_times: step > 0 ? Math.ceil(continued / step) : 0,
+      finished_by: buildResultMode(answeredCount)
+    };
+  }
+
+  function vectorToScoreMap(userVec) {
+    const result = {};
+    DIMENSION_IDS.forEach((dimensionId, index) => {
+      result[dimensionId] = roundNumber(toFiniteNumber(userVec?.[index], 0), 4);
+    });
+    return result;
+  }
+
+  function buildAnonymousResultPayload(hero, matchInfo = {}) {
+    const funProfile = buildFunProfile(getFinalUserVector(), hero);
+    const similarity = toFiniteNumber(matchInfo.similarity, 0);
+    return {
+      hero_name: hero?.name || "",
+      hero_title: hero?.title || "",
+      hero_alias: hero?.alias || "",
+      personality_title: funProfile.title || "",
+      personality_subtitle: funProfile.subtitle || "",
+      similarity: roundNumber(similarity, 6),
+      match_percent: Number(formatSimilarity(similarity).replace("%", "")) || 0
+    };
+  }
+
+  function buildAnonymousTopMatches(topFive = []) {
+    return topFive.slice(0, 5).map((item, index) => ({
+      rank: index + 1,
+      hero_name: item.hero?.name || "",
+      hero_title: item.hero?.title || "",
+      hero_alias: item.hero?.alias || "",
+      similarity: roundNumber(toFiniteNumber(item.similarity, 0), 6),
+      match_percent: Number(formatSimilarity(item.similarity).replace("%", "")) || 0
+    }));
+  }
+
+  function buildAnonymousAnswersPayload(records = []) {
+    return records.map((record, index) => ({
+      order: index + 1,
+      question_id: record.questionId || record.id || `Q${index + 1}`,
+      dimension: record.dimension || "",
+      reverse: Boolean(record.reverse),
+      polarity: record.polarity || "",
+      selected_label: record.rawLabel || record.label || "",
+      raw_value: toFiniteNumber(record.rawValue, 0),
+      final_score: roundNumber(toFiniteNumber(record.score, 0), 4),
+      weight: roundNumber(normalizeQuestionWeight(record.weight), 4),
+      consistency_pair_id: record.consistencyPairId || ""
+    }));
+  }
+
+  function sanitizeConsistencyReport(report = {}) {
+    return {
+      enabled: Boolean(report.enabled),
+      answered_pairs: Number(report.answeredPairs || 0),
+      contradiction_count: Number(report.contradictionCount || 0),
+      strong_contradiction_count: Number(report.strongContradictionCount || 0),
+      consistency_score: Number(report.consistencyScore || 100),
+      should_warn: Boolean(report.shouldWarn),
+      level: report.level || "ok"
+    };
+  }
+
+  function roundNumber(value, digits = 4) {
+    const num = toFiniteNumber(value, 0);
+    const factor = 10 ** digits;
+    return Math.round(num * factor) / factor;
   }
 
   function buildFunProfile(userVec, hero) {
@@ -887,6 +1082,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     lastAnswerTime = 0;
     consistencyReport = createEmptyConsistencyReport();
     lastResultPayload = null;
+    hasSubmittedAnonymousResult = false;
     clearProgress();
     hideResult();
     renderQuestion();

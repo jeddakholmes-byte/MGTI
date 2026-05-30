@@ -1,6 +1,6 @@
 // ==================== MGTI Service Worker ====================
 // 提供基础离线访问能力。该文件放在项目根目录，使 index.html 与 catalog.html 都能注册。
-const MGTI_CACHE_VERSION = "mgti-cache-v4-gate-choice";
+const MGTI_CACHE_VERSION = "mgti-cache-v5-answer-state-fix";
 const MGTI_APP_SHELL = [
   "./",
   "./index.html",

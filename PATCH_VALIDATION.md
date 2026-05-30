@@ -1,18 +1,34 @@
-# MGTI Gate Choice Fix Validation
-## 修改结论
-- 已重新修复 `test.js`。完成 20 道后会进入选择页，不会继续自动渲染第 21 题。
-- 已升级 `PROGRESS_KEY` 和 `PROGRESS_VERSION`，旧的 80 题进度不会继续污染新流程。
-- 已给 `index.html` 的 CSS/JS 引用增加 `?v=mgti-gate-v4`，避免浏览器或 Service Worker 继续使用旧缓存。
-- 已升级 `sw.js` 缓存版本，并把 JS/CSS 改为 network-first。
-- 已追加更强 CSS 选择器，压掉题目区域居中、字号过大、换行居中的问题。
+# Patch Validation
 
-## 题库配置
-- 候选题数量：80
-- 基础题量：20
-- 每次继续追加：10
-- 最大题量：80
+## 静态检查
 
-## 语法检查
-```text
-node --check exit code: 0
+- `frontend/js/test.js` 已通过：`node --check`
+- `index.html` 已升级资源版本号：`mgti-answer-state-v51`
+- `sw.js` 已升级缓存版本号：`mgti-cache-v5-answer-state-fix`
+
+## 关键逻辑确认
+
+`test.js` 已包含：
+
+```js
+const PROGRESS_KEY = "mgti_progress_v5_answer_state_fix";
+const PROGRESS_VERSION = "5.1-answer-state-fix";
 ```
+
+并新增：
+
+```js
+resetTransientAnswerVisualState()
+clearOptionVisualState()
+restoreCurrentQuestionAnswerVisualState()
+markOptionAsSelected(rawValue)
+releaseQuestionFocus()
+```
+
+`style.css` 已包含：
+
+```css
+Answer State Fix v5.1 · Anti Sticky Highlight
+```
+
+用于压掉移动端 sticky hover 和旧 focus 残留。
