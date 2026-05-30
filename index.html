@@ -4,13 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="description" content="MGTI - 基于英雄联盟英雄人格的趣味测试，找到与你灵魂共鸣的英雄">
+  <meta name="description" content="MGTI - 基于英雄联盟英雄人格的趣味测试，通过MBTI人格理论找到与你灵魂共鸣的本命英雄">
+  <meta name="keywords" content="英雄联盟,MBTI,人格测试,英雄联盟测试,本命英雄,符文之地">
   <meta name="theme-color" content="#0a0c14">
-  <title>MGTI · 英雄联盟人格测试</title>
+  <title>MGTI · 英雄联盟人格测试 · 召唤你的本命英雄</title>
   <link rel="stylesheet" href="frontend/css/style.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap"
     rel="stylesheet">
+  <!-- 可选：添加 favicon -->
+  <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
 </head>
 
 <body>
@@ -24,9 +27,19 @@
           <div class="brand-sub">—— 召唤你的本命英雄 ——</div>
         </div>
 
+        <!-- 进度恢复提示横幅（默认隐藏，由 test.js 控制） -->
+        <div id="resume-banner"
+          style="display: none; background: rgba(226, 184, 107, 0.2); border: 1px solid #e2b86b; border-radius: 60px; padding: 0.8rem 1rem; margin-bottom: 1.5rem; text-align: center; backdrop-filter: blur(8px);">
+          <span>📌 检测到未完成的测试，是否继续？</span>
+          <button id="resume-yes"
+            style="margin-left: 1rem; background: #e2b86b; border: none; border-radius: 40px; padding: 0.3rem 1rem; cursor: pointer; font-weight: bold;">继续</button>
+          <button id="resume-no"
+            style="margin-left: 0.5rem; background: transparent; border: 1px solid #e2b86b; border-radius: 40px; padding: 0.3rem 1rem; cursor: pointer;">重新开始</button>
+        </div>
+
         <!-- 题目区域 -->
         <div id="question-area" class="question-card">
-          <!-- 动态渲染题目 -->
+          <div class="loading">✨ 正在加载召唤师峡谷...</div>
         </div>
 
         <!-- 结果区域 -->
@@ -34,13 +47,14 @@
           <!-- 动态渲染结果 -->
         </div>
 
-        <!-- 进度提示（动态文案） -->
-        <div id="progress-hint" class="progress-hint" style="display: none;"></div>
-
         <div class="nav-links">
           <a href="catalog.html" class="btn-outline">📖 英雄图鉴</a>
-          <!-- 分享按钮将在结果页动态显示，此处预留容器 -->
         </div>
+
+        <footer style="text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.6;">
+          <p>⚔️ 基于英雄联盟世界观 · MGTI 人格测试</p>
+          <p>数据来源：英雄联盟宇宙 | 仅供娱乐与人格探索</p>
+        </footer>
       </div>
     </main>
   </div>

@@ -10,6 +10,7 @@ body {
   color: #e9f1f7;
   min-height: 100vh;
   line-height: 1.5;
+  overflow-x: hidden;
 }
 
 .app-container {
@@ -19,6 +20,7 @@ body {
   position: relative;
 }
 
+/* 动态背景光效 */
 .hero-bg {
   position: fixed;
   top: 0;
@@ -28,6 +30,24 @@ body {
   background: radial-gradient(circle at 30% 20%, rgba(80, 100, 200, 0.15), transparent 70%);
   pointer-events: none;
   z-index: 0;
+  animation: bgPulse 12s ease-in-out infinite;
+}
+
+@keyframes bgPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
 }
 
 .content-wrapper {
@@ -67,7 +87,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
   transition: all 0.25s;
-  animation: fadeInUp 0.5s ease;
+  animation: fadeInUp 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 
 .question-text {
@@ -98,6 +118,9 @@ body {
   transition: all 0.2s;
   color: #eef4ff;
   min-width: 100px;
+  /* 移动端触摸优化 */
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 .option-btn:hover {
@@ -106,12 +129,47 @@ body {
   transform: translateY(-2px);
 }
 
+.option-btn:active {
+  transform: scale(0.96);
+  background: rgba(210, 180, 100, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .progress-info {
   display: flex;
   justify-content: space-between;
   font-size: 0.85rem;
   color: #9aaebf;
   margin-top: 1rem;
+}
+
+/* 进度条美化：渐变条纹 + 发光 */
+.progress-bar-container {
+  margin-top: 1rem;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #e2b86b, #c5812e, #e2b86b);
+  background-size: 200% 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 .result-card {
@@ -132,6 +190,11 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #e2b86b;
+  transition: transform 0.3s;
+}
+
+.result-avatar img:hover {
+  transform: scale(1.05);
 }
 
 .match-name {
@@ -168,6 +231,12 @@ body {
   text-align: left;
   backdrop-filter: blur(4px);
   border: 1px solid rgba(226, 184, 107, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.analysis-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
 }
 
 .analysis-section h3 {
@@ -280,6 +349,7 @@ body {
 .btn-primary:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
 }
 
 .btn-outline {
@@ -294,7 +364,7 @@ body {
   transform: translateY(-2px);
 }
 
-/* 分享按钮样式（新增） */
+/* 分享按钮样式 */
 .btn-share {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -341,6 +411,7 @@ body {
   font-size: 0.9rem;
   outline: none;
   transition: all 0.2s;
+  min-height: 44px;
 }
 
 .search-input:focus,
@@ -361,16 +432,17 @@ body {
   border-radius: 28px;
   padding: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: 0.2s;
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
   cursor: pointer;
   text-align: center;
   animation: fadeInUp 0.4s ease;
 }
 
 .champion-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px) scale(1.02);
   border-color: #e2b86b;
-  background: rgba(30, 40, 52, 0.85);
+  background: rgba(30, 40, 52, 0.9);
+  box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.5);
 }
 
 .champion-avatar {
@@ -381,6 +453,11 @@ body {
   overflow: hidden;
   background: #1e2a32;
   border: 2px solid #e2b86b;
+  transition: transform 0.2s;
+}
+
+.champion-card:hover .champion-avatar {
+  transform: scale(1.05);
 }
 
 .champion-avatar img {
@@ -409,6 +486,12 @@ body {
   font-size: 0.7rem;
   font-weight: 600;
   margin: 0.5rem 0;
+  transition: background 0.2s;
+}
+
+.champion-card:hover .champion-mbti {
+  background: #e2b86b;
+  color: #0f111a;
 }
 
 .story-snippet {
@@ -430,6 +513,20 @@ body {
   text-align: center;
   padding: 3rem;
   color: #aaa;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 5px rgba(226, 184, 107, 0.5);
+  }
 }
 
 /* 模态框样式 */
@@ -458,6 +555,21 @@ body {
   max-height: 85vh;
   overflow-y: auto;
   animation: zoomIn 0.3s ease;
+}
+
+/* 模态框滚动条美化 */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #1e2a32;
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #e2b86b;
+  border-radius: 3px;
 }
 
 .close-modal {
@@ -536,6 +648,7 @@ body {
     padding: 0.6rem 1rem;
     font-size: 0.8rem;
     min-width: 70px;
+    min-height: 40px;
   }
 
   .champion-grid {
@@ -552,5 +665,12 @@ body {
 
   .analysis-grid {
     flex-direction: column;
+  }
+}
+
+/* 平板横屏优化 */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .champion-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }

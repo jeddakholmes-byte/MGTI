@@ -32,6 +32,13 @@ function updateResultCount(count) {
   if (countSpan) countSpan.textContent = `共 ${count} 位英雄`;
 }
 
+// 获取MBTI中文描述
+function getMbtiDescription(mbti) {
+  if (!mbti || mbti === '未知') return '待分类';
+  const analysis = window.mbtiDeepAnalysis && window.mbtiDeepAnalysis[mbti];
+  return analysis ? analysis.title : mbti;
+}
+
 // 渲染英雄卡片网格
 function renderChampionGrid(champions) {
   const grid = document.getElementById('champion-grid');
@@ -48,6 +55,7 @@ function renderChampionGrid(champions) {
     const storyPlain = champ.story ? champ.story.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : '暂无故事';
     const avatarUrl = champ.image_url || 'https://ddragon.leagueoflegends.com/cdn/15.5.1/img/champion/default.png';
     const mbtiDisplay = champ.mbti && champ.mbti !== '未知' ? champ.mbti : '待分类';
+    const mbtiDesc = getMbtiDescription(champ.mbti);
 
     html += `
       <div class="champion-card" data-name="${escapeHtml(champ.name)}" data-mbti="${mbtiDisplay}">
@@ -57,15 +65,18 @@ function renderChampionGrid(champions) {
         <div class="champion-name">${escapeHtml(champ.name)}</div>
         <div class="champion-title">${escapeHtml(champ.title || '符文之地英雄')}</div>
         <div class="champion-mbti">${escapeHtml(mbtiDisplay)}</div>
+        <div class="mbti-hint">${escapeHtml(mbtiDesc)}</div>
         <div class="story-snippet">${escapeHtml(storyPlain)}</div>
       </div>
     `;
   });
   grid.innerHTML = html;
 
-  // 绑定卡片点击事件（事件委托提高性能）
+  // 绑定卡片点击事件
   grid.querySelectorAll('.champion-card').forEach(card => {
     card.addEventListener('click', (e) => {
+      // 防止点击到内部按钮时触发（若有）
+      if (e.target.closest('.btn')) return;
       const name = card.dataset.name;
       const champion = allChampions.find(c => c.name === name);
       if (champion) showDetailModal(champion);

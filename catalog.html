@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="description" content="英雄联盟英雄人格图鉴 - 探索符文之地英雄的MBTI人格类型与深度解析">
+  <meta name="description" content="英雄联盟英雄人格图鉴 - 基于MBTI人格类型，探索符文之地英雄的性格密码与深度解析">
+  <meta name="keywords" content="英雄联盟,MBTI,人格测试,英雄图鉴,符文之地">
   <meta name="theme-color" content="#0a0c14">
   <title>英雄图鉴 · MGTI · 探索人格与英雄的共鸣</title>
   <link rel="stylesheet" href="frontend/css/style.css">
@@ -19,7 +20,7 @@
       <h1>⚔️ 英雄图鉴</h1>
       <p>探索符文之地的人格图谱 · 点击英雄卡片查看深度人格解析</p>
       <div class="filter-bar">
-        <input type="text" id="search-input" placeholder="搜索英雄名称或别称（如：亚索、EZ、盲僧）..." class="search-input">
+        <input type="text" id="search-input" class="search-input" placeholder="搜索英雄名称或别称（如：亚索、EZ、盲僧、劫）...">
         <select id="mbti-filter" class="mbti-filter">
           <option value="all">全部人格</option>
           <option value="INTJ">INTJ（建筑师）</option>
@@ -42,9 +43,9 @@
       </div>
     </header>
 
+    <!-- 英雄卡片网格容器 -->
     <div id="champion-grid" class="champion-grid">
-      <!-- 动态渲染卡片 -->
-      <div class="loading">✨ 正在召唤英雄...</div>
+      <div class="loading">✨ 正在召唤英雄，请稍候...</div>
     </div>
 
     <div class="back-home">
@@ -52,7 +53,7 @@
     </div>
   </div>
 
-  <!-- 模态框容器将由 catalog.js 动态创建，无需提前写死 -->
+  <!-- JavaScript 文件引入 -->
   <script src="frontend/js/data.js"></script>
   <script src="frontend/js/catalog.js"></script>
 </body>
