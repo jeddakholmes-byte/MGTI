@@ -1,5 +1,5 @@
 {
-  "version": "3.0",
+  "version": "3.2-gate-choice-fixed",
   "schema": "MGTI_QUESTIONS_V3_FUN_RANDOM_POOL",
   "display": {
     "mode": "fun-first",
@@ -21,7 +21,8 @@
     "shuffleWithinPairs": true,
     "seedMode": "session-random",
     "showChoiceAfterBase": true,
-    "note": "保留 80 道候选题。用户先完成 20 道基础测试后，可以直接出结果，也可以每次继续追加 10 道题。做题越多，五维均值越稳定，英雄匹配越贴近完整算法。"
+    "note": "保留 80 道候选题。用户先完成 20 道基础测试后必须进入选择页：可以直接出结果，也可以继续追加 10 道题。每追加一次会提高题库覆盖度，结果更贴近完整算法。",
+    "forceChoiceGateAtTargets": true
   },
   "scoring": {
     "scale": [

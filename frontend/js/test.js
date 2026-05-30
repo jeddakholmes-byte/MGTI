@@ -1,10 +1,10 @@
 // ==================== MGTI 测试核心逻辑 ====================
 // My Game Type Indicator
-// V3: 保留五维向量匹配算法，增加趣味题面、随机抽题、梗化结果页与一致性提示。
+// V4: 保留五维向量匹配算法，增加阶段性选择页。用户完成基础题量后可直接出结果，也可继续答题提高算法覆盖度。
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const PROGRESS_KEY = "mgti_progress_v3_fun";
-  const PROGRESS_VERSION = "3.1-progressive-choice";
+  const PROGRESS_KEY = "mgti_progress_v4_gate_choice";
+  const PROGRESS_VERSION = "4.0-fixed-choice-gate";
   const DIMENSION_IDS = window.MGTI_DIMENSION_IDS || ["TAC", "TEA", "EMO", "DEC", "PRE"];
   const ANSWER_THROTTLE_MS = 300;
   const SCORE_MIN = -2;
@@ -203,12 +203,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function shouldShowResultGate() {
-    return currentIndex >= totalQuestions && currentIndex < getMaxQuestionCount();
+    const sampling = window.questionMeta?.sampling || {};
+    const gateEnabled = sampling.showChoiceAfterBase !== false;
+    return gateEnabled && currentIndex >= totalQuestions && currentIndex < getMaxQuestionCount();
   }
 
   function extendQuestionTarget() {
     const previousTarget = totalQuestions;
     const nextTarget = clampQuestionTarget(previousTarget + getContinueStepCount());
+    if (nextTarget <= previousTarget) {
+      finishTest();
+      return;
+    }
     currentTargetCount = nextTarget;
     totalQuestions = nextTarget;
     saveProgress();
@@ -238,13 +244,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const coverageLabel = getCoverageLabel(answeredCount, maxCount);
 
     questionArea.style.display = "block";
+    questionArea.dataset.state = "choice-gate";
     questionArea.innerHTML = `
       <div class="choice-gate-card">
         <div class="choice-gate-eyebrow">已完成 ${answeredCount} 道 · ${coverageLabel}</div>
         <h2 class="choice-gate-title">现在可以出结果，也可以继续校准</h2>
         <p class="choice-gate-text">
-          你已经完成基础题量，系统可以直接根据目前的五维均值匹配本命英雄。
-          如果继续做题，系统会覆盖更多候选题，减少随机题目带来的偏差，结果会更贴近完整算法。
+          你已经完成基础题量。现在可以直接根据当前五维均值匹配本命英雄。
+          也可以继续做题。继续做得越多，系统覆盖的候选题越多，随机题目带来的偏差越小，结果越接近完整算法。
         </p>
 
         <div class="choice-accuracy-box" aria-label="算法覆盖度">
@@ -297,6 +304,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!questionArea) return;
     hideResult();
 
+    // 关键修复：只要已经达到当前阶段题量，就不再继续渲染下一题。
+    // 例如基础题量为 20，道数达到 20 后必须先显示“直接出结果 / 继续做题”的选择页。
+    if (currentIndex >= totalQuestions) {
+      if (shouldShowResultGate()) {
+        showResultChoiceGate();
+      } else {
+        finishTest();
+      }
+      return;
+    }
+
     const q = activeQuestions[currentIndex];
     if (!q) {
       finishTest();
@@ -318,6 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `).join("");
 
     questionArea.style.display = "block";
+    questionArea.dataset.state = "question";
     questionArea.innerHTML = `
       <div class="progress-wrap">
         <div class="progress-meta">
@@ -412,8 +431,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     recalcScores();
-    saveProgress();
     currentIndex += 1;
+    saveProgress();
 
     window.setTimeout(() => {
       isAnswering = false;
@@ -844,10 +863,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     consistencyReport = progress.consistencyReport || createEmptyConsistencyReport();
     window.MGTI_ACTIVE_QUESTIONS = activeQuestions;
     recalcScores();
-    if (currentIndex >= totalQuestions && shouldShowResultGate()) {
-      showResultChoiceGate();
-    } else if (currentIndex >= getMaxQuestionCount()) {
-      finishTest();
+    if (currentIndex >= totalQuestions) {
+      if (shouldShowResultGate()) {
+        showResultChoiceGate();
+      } else {
+        finishTest();
+      }
     } else {
       renderQuestion();
     }
@@ -1028,6 +1049,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   window.MGTITestDebug = {
+    showResultChoiceGate,
+    shouldShowResultGate,
+    extendQuestionTarget,
     getState: () => ({ currentIndex, currentTargetCount, userScores, dimensionCounts, answerRecords, totalQuestions, totalAvailableQuestions: getMaxQuestionCount(), consistencyReport, questionMeta: window.questionMeta || null, activeQuestions, questionPool, lastResultPayload }),
     recalcScores,
     resetTest,

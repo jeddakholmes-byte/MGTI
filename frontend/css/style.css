@@ -1884,3 +1884,115 @@ footer p {
     width: 100%;
   }
 }
+
+
+/* ==================== Gate Choice Fix v4 · Definitive Readability Overrides ==================== */
+/* 这一段专门压掉题目区域继承到的居中样式。问题正文和选项一律左对齐，避免长句自动换行后仍然居中。 */
+body #question-area {
+  text-align: left !important;
+}
+
+body #question-area .progress-wrap,
+body #question-area .question-kicker,
+body #question-area .question-actions,
+body #question-area .choice-gate-card,
+body #question-area .choice-accuracy-box {
+  text-align: left !important;
+}
+
+body #question-area .question-kicker,
+body #question-area .question-actions {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+}
+
+body #question-area .question-text,
+body #question-area h2.question-text {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 1.15rem 0 !important;
+  text-align: left !important;
+  font-size: clamp(1.02rem, 2.35vw, 1.28rem) !important;
+  line-height: 1.66 !important;
+  font-weight: 620 !important;
+  letter-spacing: 0 !important;
+  text-wrap: pretty !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  hyphens: auto !important;
+}
+
+body #question-area .question-hint {
+  width: 100% !important;
+  text-align: left !important;
+  font-size: 0.8rem !important;
+  line-height: 1.65 !important;
+  margin: 0 0 1rem 0 !important;
+}
+
+body #question-area .options-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  gap: 0.72rem !important;
+  width: 100% !important;
+  margin-top: 1rem !important;
+}
+
+body #question-area .option-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.55rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 50px !important;
+  border-radius: 18px !important;
+  text-align: left !important;
+  white-space: normal !important;
+  font-size: 0.88rem !important;
+  line-height: 1.42 !important;
+  padding: 0.82rem 0.95rem !important;
+}
+
+body #question-area .option-btn span:not(.option-emoji) {
+  display: block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+body #question-area .choice-gate-title {
+  text-align: left !important;
+  font-size: clamp(1.22rem, 3.4vw, 1.72rem) !important;
+  line-height: 1.32 !important;
+}
+
+body #question-area .choice-gate-text,
+body #question-area .choice-accuracy-box p,
+body #question-area .choice-back-btn {
+  text-align: left !important;
+}
+
+body #question-area .choice-gate-actions {
+  justify-content: flex-start !important;
+}
+
+@media (max-width: 640px) {
+  body #question-area .question-text,
+  body #question-area h2.question-text {
+    font-size: 1.03rem !important;
+    line-height: 1.68 !important;
+  }
+
+  body #question-area .options-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  body #question-area .option-btn {
+    font-size: 0.86rem !important;
+  }
+}

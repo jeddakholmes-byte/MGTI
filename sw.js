@@ -1,6 +1,6 @@
 // ==================== MGTI Service Worker ====================
 // 提供基础离线访问能力。该文件放在项目根目录，使 index.html 与 catalog.html 都能注册。
-const MGTI_CACHE_VERSION = "mgti-cache-v2.1.0";
+const MGTI_CACHE_VERSION = "mgti-cache-v4-gate-choice";
 const MGTI_APP_SHELL = [
   "./",
   "./index.html",
@@ -55,6 +55,20 @@ self.addEventListener("fetch", (event) => {
         return networkResponse;
       } catch (error) {
         return (await caches.match(request)) || (await caches.match("./index.html"));
+      }
+    })());
+    return;
+  }
+
+  if (url.pathname.endsWith(".js") || url.pathname.endsWith(".css")) {
+    event.respondWith((async () => {
+      const cache = await caches.open(MGTI_CACHE_VERSION);
+      try {
+        const networkResponse = await fetch(request);
+        cache.put(request, networkResponse.clone());
+        return networkResponse;
+      } catch (error) {
+        return (await cache.match(request)) || Response.error();
       }
     })());
     return;

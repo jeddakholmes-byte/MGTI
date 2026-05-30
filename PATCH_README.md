@@ -1,22 +1,31 @@
-# MGTI 渐进式答题补丁
+# MGTI Gate Choice Fix Patch
 
-把压缩包内文件按原路径覆盖到项目中。
+这次补丁修复两个实际问题：
+
+1. 做完 20 道后没有出现“直接出结果 / 继续做题”的选择页。
+2. 题目区域仍然居中、字号偏大，长题目换行后不好看。
+
+请按路径覆盖：
 
 ```text
-data/questions.json
-frontend/js/test.js
-frontend/css/style.css
-index.html
-README.md
-PATCH_VALIDATION.md
+MGTI/
+├── data/
+│   └── questions.json
+├── frontend/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── test.js
+├── index.html
+├── sw.js
+└── README.md
 ```
 
-主要变化：
+覆盖后建议在浏览器里强制刷新一次：
 
-- 保留 80 道候选题。
-- 用户先做 20 道基础题。
-- 20 道后可以直接出结果，也可以继续做 10 道。
-- 继续做题时页面会提示：题目越多，五维均值越稳定，结果越贴近完整算法。
-- 修复题目和选项换行后仍然居中的问题。
-- 降低题目字号，减少压迫感。
+```text
+Mac: Command + Shift + R
+Windows: Ctrl + Shift + R
+```
 
+如果你之前已经安装过 PWA 或浏览器强缓存非常顽固，可以在 DevTools → Application → Service Workers 里点 Unregister，再刷新页面。

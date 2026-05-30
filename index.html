@@ -35,16 +35,16 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="frontend/css/style.css">
+  <link rel="stylesheet" href="frontend/css/style.css?v=mgti-gate-v4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap"
     rel="stylesheet">
 
-  <script src="frontend/js/config.js" defer></script>
-  <script src="frontend/js/data.js" defer></script>
-  <script src="frontend/js/test.js" defer></script>
+  <script src="frontend/js/config.js?v=mgti-gate-v4" defer></script>
+  <script src="frontend/js/data.js?v=mgti-gate-v4" defer></script>
+  <script src="frontend/js/test.js?v=mgti-gate-v4" defer></script>
 </head>
 
 <body data-page="test">
@@ -141,7 +141,9 @@
       if (window.location.protocol === "file:") return;
 
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("./sw.js").catch(function (error) {
+        navigator.serviceWorker.register("./sw.js?v=mgti-gate-v4").then(function (registration) {
+          registration.update && registration.update();
+        }).catch(function (error) {
           console.warn("[MGTI] Service Worker 注册失败：", error);
         });
       });
