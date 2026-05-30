@@ -891,8 +891,11 @@ async function loadQuestions() {
 
   window.questionMeta = {
     version: data?.version || "fallback",
+    schema: data?.schema || null,
     consistency: data?.consistency || null,
     scoring: data?.scoring || null,
+    sampling: data?.sampling || null,
+    display: data?.display || null,
     total: window.questions.length
   };
 

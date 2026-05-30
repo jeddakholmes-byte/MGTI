@@ -1,6 +1,28 @@
 {
-  "version": "2.0",
-  "schema": "MGTI_QUESTIONS_V2",
+  "version": "3.0",
+  "schema": "MGTI_QUESTIONS_V3_FUN_RANDOM_POOL",
+  "display": {
+    "mode": "fun-first",
+    "fallbackFieldOrder": [
+      "funText",
+      "text",
+      "plainText"
+    ],
+    "introHint": "题目会尽量用玩家能看懂的场景说人话，但底层仍然按 TAC/TEA/EMO/DEC/PRE 五维计分。"
+  },
+  "sampling": {
+    "enabled": true,
+    "strategy": "progressive-choice-balanced-pairs",
+    "baseQuestionCount": 20,
+    "continueStepQuestions": 10,
+    "maxQuestions": 80,
+    "totalCandidateQuestions": 80,
+    "shuffleQuestions": true,
+    "shuffleWithinPairs": true,
+    "seedMode": "session-random",
+    "showChoiceAfterBase": true,
+    "note": "保留 80 道候选题。用户先完成 20 道基础测试后，可以直接出结果，也可以每次继续追加 10 道题。做题越多，五维均值越稳定，英雄匹配越贴近完整算法。"
+  },
   "scoring": {
     "scale": [
       {
@@ -24,10 +46,10 @@
         "rawValue": 2
       }
     ],
-    "compatibilityNote": "当前 test.js 使用 rawValue 计分。reverse=false 表示题干描述低分倾向；reverse=true 表示题干描述高分倾向，前端会将 rawValue 取反。因此本文件保留 text/dimension/reverse 三个必需字段，新增 id/polarity/consistencyPairId 等字段不会破坏现有代码。",
+    "compatibilityNote": "reverse=false 表示题干描述低分倾向；reverse=true 表示题干描述高分倾向。新增 funText/tone/sampling 不会破坏旧代码。",
     "scoreMeaning": {
-      "negative": "更接近该维度 lowLabel",
-      "positive": "更接近该维度 highLabel"
+      "negative": "更接近 lowLabel / memeLowLabel",
+      "positive": "更接近 highLabel / memeHighLabel"
     }
   },
   "consistency": {
@@ -35,7 +57,7 @@
     "minAnsweredPairs": 3,
     "contradictionThreshold": 3,
     "strongContradictionRawAbs": 2,
-    "suggestedWarningText": "部分答案之间存在明显矛盾，结果可能不够稳定。建议重新测试，或按真实游戏习惯作答。",
+    "suggestedWarningText": "系统检测到你刚刚精神状态略有摇摆：有些答案互相打架。结果仍然可看，但可能更接近你真实的峡谷发疯状态。",
     "pairs": [
       {
         "id": "TAC-C1",
@@ -43,7 +65,7 @@
         "lowQuestionId": "TAC-L1",
         "highQuestionId": "TAC-H1",
         "relation": "opposite",
-        "reason": "一个强调不记冷却、凭手感行动；一个强调主动记录关键技能时间。"
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
       },
       {
         "id": "TAC-C2",
@@ -51,7 +73,55 @@
         "lowQuestionId": "TAC-L2",
         "highQuestionId": "TAC-H2",
         "relation": "opposite",
-        "reason": "一个强调临场即兴；一个强调提前设计兵线和资源节奏。"
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
+      },
+      {
+        "id": "TAC-C3",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L3",
+        "highQuestionId": "TAC-H3",
+        "relation": "opposite",
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
+      },
+      {
+        "id": "TAC-C4",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L4",
+        "highQuestionId": "TAC-H4",
+        "relation": "opposite",
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
+      },
+      {
+        "id": "TAC-C5",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L5",
+        "highQuestionId": "TAC-H5",
+        "relation": "opposite",
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
+      },
+      {
+        "id": "TAC-C6",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L6",
+        "highQuestionId": "TAC-H6",
+        "relation": "opposite",
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
+      },
+      {
+        "id": "TAC-C7",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L7",
+        "highQuestionId": "TAC-H7",
+        "relation": "opposite",
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
+      },
+      {
+        "id": "TAC-C8",
+        "dimension": "TAC",
+        "lowQuestionId": "TAC-L8",
+        "highQuestionId": "TAC-H8",
+        "relation": "opposite",
+        "reason": "这组题分别描述 手感怪 与 算盘精 两种相反倾向。"
       },
       {
         "id": "TEA-C1",
@@ -59,7 +129,7 @@
         "lowQuestionId": "TEA-L1",
         "highQuestionId": "TEA-H1",
         "relation": "opposite",
-        "reason": "一个强调边路个人突破；一个强调牺牲发育支援团队。"
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
       },
       {
         "id": "TEA-C2",
@@ -67,7 +137,55 @@
         "lowQuestionId": "TEA-L2",
         "highQuestionId": "TEA-H2",
         "relation": "opposite",
-        "reason": "一个强调自己拿资源打穿；一个强调保护核心输出。"
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
+      },
+      {
+        "id": "TEA-C3",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L3",
+        "highQuestionId": "TEA-H3",
+        "relation": "opposite",
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
+      },
+      {
+        "id": "TEA-C4",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L4",
+        "highQuestionId": "TEA-H4",
+        "relation": "opposite",
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
+      },
+      {
+        "id": "TEA-C5",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L5",
+        "highQuestionId": "TEA-H5",
+        "relation": "opposite",
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
+      },
+      {
+        "id": "TEA-C6",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L6",
+        "highQuestionId": "TEA-H6",
+        "relation": "opposite",
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
+      },
+      {
+        "id": "TEA-C7",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L7",
+        "highQuestionId": "TEA-H7",
+        "relation": "opposite",
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
+      },
+      {
+        "id": "TEA-C8",
+        "dimension": "TEA",
+        "lowQuestionId": "TEA-L8",
+        "highQuestionId": "TEA-H8",
+        "relation": "opposite",
+        "reason": "这组题分别描述 边路自闭人 与 团队老妈子 两种相反倾向。"
       },
       {
         "id": "EMO-C1",
@@ -75,7 +193,7 @@
         "lowQuestionId": "EMO-L1",
         "highQuestionId": "EMO-H1",
         "relation": "opposite",
-        "reason": "一个强调被单杀后止损；一个强调被单杀后马上想打回来。"
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
       },
       {
         "id": "EMO-C2",
@@ -83,7 +201,55 @@
         "lowQuestionId": "EMO-L2",
         "highQuestionId": "EMO-H2",
         "relation": "opposite",
-        "reason": "一个强调优势时稳拿资源；一个强调优势时继续越塔追击。"
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
+      },
+      {
+        "id": "EMO-C3",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L3",
+        "highQuestionId": "EMO-H3",
+        "relation": "opposite",
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
+      },
+      {
+        "id": "EMO-C4",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L4",
+        "highQuestionId": "EMO-H4",
+        "relation": "opposite",
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
+      },
+      {
+        "id": "EMO-C5",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L5",
+        "highQuestionId": "EMO-H5",
+        "relation": "opposite",
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
+      },
+      {
+        "id": "EMO-C6",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L6",
+        "highQuestionId": "EMO-H6",
+        "relation": "opposite",
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
+      },
+      {
+        "id": "EMO-C7",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L7",
+        "highQuestionId": "EMO-H7",
+        "relation": "opposite",
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
+      },
+      {
+        "id": "EMO-C8",
+        "dimension": "EMO",
+        "lowQuestionId": "EMO-L8",
+        "highQuestionId": "EMO-H8",
+        "relation": "opposite",
+        "reason": "这组题分别描述 冰箱人 与 一点就着 两种相反倾向。"
       },
       {
         "id": "DEC-C1",
@@ -91,7 +257,7 @@
         "lowQuestionId": "DEC-L1",
         "highQuestionId": "DEC-H1",
         "relation": "opposite",
-        "reason": "一个强调等队友和视野到位；一个强调看到窗口立刻强开。"
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
       },
       {
         "id": "DEC-C2",
@@ -99,7 +265,55 @@
         "lowQuestionId": "DEC-L2",
         "highQuestionId": "DEC-H2",
         "relation": "opposite",
-        "reason": "一个强调放弃不确定机会；一个强调短窗口内立即赌一波。"
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
+      },
+      {
+        "id": "DEC-C3",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L3",
+        "highQuestionId": "DEC-H3",
+        "relation": "opposite",
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
+      },
+      {
+        "id": "DEC-C4",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L4",
+        "highQuestionId": "DEC-H4",
+        "relation": "opposite",
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
+      },
+      {
+        "id": "DEC-C5",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L5",
+        "highQuestionId": "DEC-H5",
+        "relation": "opposite",
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
+      },
+      {
+        "id": "DEC-C6",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L6",
+        "highQuestionId": "DEC-H6",
+        "relation": "opposite",
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
+      },
+      {
+        "id": "DEC-C7",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L7",
+        "highQuestionId": "DEC-H7",
+        "relation": "opposite",
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
+      },
+      {
+        "id": "DEC-C8",
+        "dimension": "DEC",
+        "lowQuestionId": "DEC-L8",
+        "highQuestionId": "DEC-H8",
+        "relation": "opposite",
+        "reason": "这组题分别描述 等一等大师 与 我先上了 两种相反倾向。"
       },
       {
         "id": "PRE-C1",
@@ -107,7 +321,7 @@
         "lowQuestionId": "PRE-L1",
         "highQuestionId": "PRE-H1",
         "relation": "opposite",
-        "reason": "一个强调稳定传统角色；一个强调高风险高上限英雄。"
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
       },
       {
         "id": "PRE-C2",
@@ -115,290 +329,1417 @@
         "lowQuestionId": "PRE-L2",
         "highQuestionId": "PRE-H2",
         "relation": "opposite",
-        "reason": "一个强调清晰职责；一个强调机制复杂与个人秀。"
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
+      },
+      {
+        "id": "PRE-C3",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L3",
+        "highQuestionId": "PRE-H3",
+        "relation": "opposite",
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
+      },
+      {
+        "id": "PRE-C4",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L4",
+        "highQuestionId": "PRE-H4",
+        "relation": "opposite",
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
+      },
+      {
+        "id": "PRE-C5",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L5",
+        "highQuestionId": "PRE-H5",
+        "relation": "opposite",
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
+      },
+      {
+        "id": "PRE-C6",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L6",
+        "highQuestionId": "PRE-H6",
+        "relation": "opposite",
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
+      },
+      {
+        "id": "PRE-C7",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L7",
+        "highQuestionId": "PRE-H7",
+        "relation": "opposite",
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
+      },
+      {
+        "id": "PRE-C8",
+        "dimension": "PRE",
+        "lowQuestionId": "PRE-L8",
+        "highQuestionId": "PRE-H8",
+        "relation": "opposite",
+        "reason": "这组题分别描述 老实英雄人 与 机制上瘾者 两种相反倾向。"
       }
-    ],
-    "futureImplementationHint": "若一对 opposite 题目 rawValue 同号且绝对值均 >= 1，可记为 1 次矛盾；若绝对值均为 2，可记为强矛盾。"
+    ]
   },
   "questions": [
     {
       "id": "TAC-L1",
-      "text": "我更相信临场手感，很少刻意记录对方闪现、净化或关键大招的时间。",
+      "text": "我打架经常先凭手感冲一下，脑子里的计算器通常开机比较慢。",
+      "plainText": "我打架经常先凭手感冲一下，脑子里的计算器通常开机比较慢。",
+      "funText": "我打架经常先凭手感冲一下，脑子里的计算器通常开机比较慢。",
       "dimension": "TAC",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "TAC-C1",
+      "tone": "self-roast",
       "tags": [
-        "冷却",
         "手感",
-        "对线"
+        "手感怪",
+        "低分侧"
       ]
     },
     {
       "id": "TAC-H1",
-      "text": "对方交出关键技能后，我会记住大致时间，并围绕下一波窗口设计击杀或压制。",
+      "text": "我会在对面交闪后默默开始倒计时，像在峡谷里做审计。",
+      "plainText": "我会在对面交闪后默默开始倒计时，像在峡谷里做审计。",
+      "funText": "我会在对面交闪后默默开始倒计时，像在峡谷里做审计。",
       "dimension": "TAC",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "TAC-C1",
+      "tone": "self-roast",
       "tags": [
         "冷却",
-        "规划",
-        "击杀窗口"
+        "算盘精",
+        "高分侧"
       ]
     },
     {
       "id": "TAC-L2",
-      "text": "我经常在没有完整计划的情况下先动手，再靠操作和反应把局面打回来。",
+      "text": "我对线时更相信“感觉能杀”，至于伤害够不够，先打了再说。",
+      "plainText": "我对线时更相信“感觉能杀”，至于伤害够不够，先打了再说。",
+      "funText": "我对线时更相信“感觉能杀”，至于伤害够不够，先打了再说。",
       "dimension": "TAC",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "TAC-C2",
+      "tone": "self-roast",
       "tags": [
-        "即兴",
-        "反应",
-        "操作"
+        "伤害",
+        "手感怪",
+        "低分侧"
       ]
     },
     {
       "id": "TAC-H2",
-      "text": "动手前我通常会先想兵线位置、打野可能路线、技能命中率和后续资源收益。",
+      "text": "我动手前会大概算一套伤害、点燃、兵线和防御塔，尽量不靠玄学。",
+      "plainText": "我动手前会大概算一套伤害、点燃、兵线和防御塔，尽量不靠玄学。",
+      "funText": "我动手前会大概算一套伤害、点燃、兵线和防御塔，尽量不靠玄学。",
       "dimension": "TAC",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "TAC-C2",
+      "tone": "self-roast",
       "tags": [
-        "兵线",
-        "资源",
-        "宏观"
+        "计算",
+        "算盘精",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TAC-L3",
+      "text": "团战混起来以后，我主要靠反应找角度，不会每一步都提前规划。",
+      "plainText": "团战混起来以后，我主要靠反应找角度，不会每一步都提前规划。",
+      "funText": "团战混起来以后，我主要靠反应找角度，不会每一步都提前规划。",
+      "dimension": "TAC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C3",
+      "tone": "self-roast",
+      "tags": [
+        "团战",
+        "手感怪",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TAC-H3",
+      "text": "团战前我会先想好站位、控制链和对面关键技能，不喜欢纯乱战。",
+      "plainText": "团战前我会先想好站位、控制链和对面关键技能，不喜欢纯乱战。",
+      "funText": "团战前我会先想好站位、控制链和对面关键技能，不喜欢纯乱战。",
+      "dimension": "TAC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C3",
+      "tone": "self-roast",
+      "tags": [
+        "规划",
+        "算盘精",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TAC-L4",
+      "text": "我不太会特意记对面打野路线，反正来了就操作一下。",
+      "plainText": "我不太会特意记对面打野路线，反正来了就操作一下。",
+      "funText": "我不太会特意记对面打野路线，反正来了就操作一下。",
+      "dimension": "TAC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C4",
+      "tone": "self-roast",
+      "tags": [
+        "打野",
+        "手感怪",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TAC-H4",
+      "text": "我会根据开野、补刀、河蟹和视野推测打野大概在哪。",
+      "plainText": "我会根据开野、补刀、河蟹和视野推测打野大概在哪。",
+      "funText": "我会根据开野、补刀、河蟹和视野推测打野大概在哪。",
+      "dimension": "TAC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C4",
+      "tone": "self-roast",
+      "tags": [
+        "路线",
+        "算盘精",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TAC-L5",
+      "text": "我经常靠突然的闪现、回头、反打把局面打回来。",
+      "plainText": "我经常靠突然的闪现、回头、反打把局面打回来。",
+      "funText": "我经常靠突然的闪现、回头、反打把局面打回来。",
+      "dimension": "TAC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C5",
+      "tone": "self-roast",
+      "tags": [
+        "反打",
+        "手感怪",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TAC-H5",
+      "text": "我更喜欢把对面逼进我提前设计好的击杀窗口。",
+      "plainText": "我更喜欢把对面逼进我提前设计好的击杀窗口。",
+      "funText": "我更喜欢把对面逼进我提前设计好的击杀窗口。",
+      "dimension": "TAC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C5",
+      "tone": "self-roast",
+      "tags": [
+        "窗口",
+        "算盘精",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TAC-L6",
+      "text": "我不喜欢把游戏打成数学题，手热的时候比什么公式都重要。",
+      "plainText": "我不喜欢把游戏打成数学题，手热的时候比什么公式都重要。",
+      "funText": "我不喜欢把游戏打成数学题，手热的时候比什么公式都重要。",
+      "dimension": "TAC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C6",
+      "tone": "self-roast",
+      "tags": [
+        "手热",
+        "手感怪",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TAC-H6",
+      "text": "我喜欢把兵线、冷却和资源时间串起来，让对面慢性窒息。",
+      "plainText": "我喜欢把兵线、冷却和资源时间串起来，让对面慢性窒息。",
+      "funText": "我喜欢把兵线、冷却和资源时间串起来，让对面慢性窒息。",
+      "dimension": "TAC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C6",
+      "tone": "self-roast",
+      "tags": [
+        "运营",
+        "算盘精",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TAC-L7",
+      "text": "有些操作我自己也解释不清，但按出来就是很顺。",
+      "plainText": "有些操作我自己也解释不清，但按出来就是很顺。",
+      "funText": "有些操作我自己也解释不清，但按出来就是很顺。",
+      "dimension": "TAC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C7",
+      "tone": "self-roast",
+      "tags": [
+        "肌肉记忆",
+        "手感怪",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TAC-H7",
+      "text": "我更相信复盘和固定连招顺序，稳定比灵光一现更可靠。",
+      "plainText": "我更相信复盘和固定连招顺序，稳定比灵光一现更可靠。",
+      "funText": "我更相信复盘和固定连招顺序，稳定比灵光一现更可靠。",
+      "dimension": "TAC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C7",
+      "tone": "self-roast",
+      "tags": [
+        "复盘",
+        "算盘精",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TAC-L8",
+      "text": "我看到对面走位失误就想马上试，错过机会会很难受。",
+      "plainText": "我看到对面走位失误就想马上试，错过机会会很难受。",
+      "funText": "我看到对面走位失误就想马上试，错过机会会很难受。",
+      "dimension": "TAC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TAC-C8",
+      "tone": "self-roast",
+      "tags": [
+        "破绽",
+        "手感怪",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TAC-H8",
+      "text": "我会判断这个失误是不是诱饵，不会每个破绽都立刻吃。",
+      "plainText": "我会判断这个失误是不是诱饵，不会每个破绽都立刻吃。",
+      "funText": "我会判断这个失误是不是诱饵，不会每个破绽都立刻吃。",
+      "dimension": "TAC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TAC-C8",
+      "tone": "self-roast",
+      "tags": [
+        "诱饵",
+        "算盘精",
+        "高分侧"
       ]
     },
     {
       "id": "TEA-L1",
-      "text": "我更享受一个人把边路带穿，哪怕正面团战暂时少一个人。",
+      "text": "队友在正面打得热火朝天时，我可能正在边路认真当拆迁办主任。",
+      "plainText": "队友在正面打得热火朝天时，我可能正在边路认真当拆迁办主任。",
+      "funText": "队友在正面打得热火朝天时，我可能正在边路认真当拆迁办主任。",
       "dimension": "TEA",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "TEA-C1",
+      "tone": "self-roast",
       "tags": [
         "单带",
-        "边路",
-        "牵制"
+        "边路自闭人",
+        "低分侧"
       ]
     },
     {
       "id": "TEA-H1",
-      "text": "只要团队节奏需要，我可以放弃一波兵线或野怪，提前去小龙、先锋或河道站位。",
+      "text": "只要团队需要，我可以放弃一波兵线去支援资源团。",
+      "plainText": "只要团队需要，我可以放弃一波兵线去支援资源团。",
+      "funText": "只要团队需要，我可以放弃一波兵线去支援资源团。",
       "dimension": "TEA",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "TEA-C1",
+      "tone": "self-roast",
       "tags": [
         "支援",
-        "资源团",
-        "站位"
+        "团队老妈子",
+        "高分侧"
       ]
     },
     {
       "id": "TEA-L2",
-      "text": "如果我拿到优势，我更希望资源继续给我，让我自己打穿比赛。",
+      "text": "我更喜欢自己拿资源打穿一路，而不是把希望寄托在队友身上。",
+      "plainText": "我更喜欢自己拿资源打穿一路，而不是把希望寄托在队友身上。",
+      "funText": "我更喜欢自己拿资源打穿一路，而不是把希望寄托在队友身上。",
       "dimension": "TEA",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "TEA-C2",
+      "tone": "self-roast",
       "tags": [
         "资源",
-        "个人 carry",
-        "滚雪球"
+        "边路自闭人",
+        "低分侧"
       ]
     },
     {
       "id": "TEA-H2",
-      "text": "团战里我会优先看队友位置和核心输出安全，而不是只盯着自己能不能收割。",
+      "text": "我愿意把资源让给更能接管比赛的队友。",
+      "plainText": "我愿意把资源让给更能接管比赛的队友。",
+      "funText": "我愿意把资源让给更能接管比赛的队友。",
       "dimension": "TEA",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "TEA-C2",
+      "tone": "self-roast",
+      "tags": [
+        "让资源",
+        "团队老妈子",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TEA-L3",
+      "text": "如果我能单杀对面，我会觉得这比集合开会更有说服力。",
+      "plainText": "如果我能单杀对面，我会觉得这比集合开会更有说服力。",
+      "funText": "如果我能单杀对面，我会觉得这比集合开会更有说服力。",
+      "dimension": "TEA",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C3",
+      "tone": "self-roast",
+      "tags": [
+        "单杀",
+        "边路自闭人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TEA-H3",
+      "text": "我更在意团队阵型和配合，不会只看自己能不能单杀。",
+      "plainText": "我更在意团队阵型和配合，不会只看自己能不能单杀。",
+      "funText": "我更在意团队阵型和配合，不会只看自己能不能单杀。",
+      "dimension": "TEA",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C3",
+      "tone": "self-roast",
+      "tags": [
+        "配合",
+        "团队老妈子",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TEA-L4",
+      "text": "队友叫我集合时，我经常先看一眼边线值不值得离开。",
+      "plainText": "队友叫我集合时，我经常先看一眼边线值不值得离开。",
+      "funText": "队友叫我集合时，我经常先看一眼边线值不值得离开。",
+      "dimension": "TEA",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C4",
+      "tone": "self-roast",
+      "tags": [
+        "边线",
+        "边路自闭人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TEA-H4",
+      "text": "我会提前围绕小龙、先锋、大龙站位，而不是临时才赶过去。",
+      "plainText": "我会提前围绕小龙、先锋、大龙站位，而不是临时才赶过去。",
+      "funText": "我会提前围绕小龙、先锋、大龙站位，而不是临时才赶过去。",
+      "dimension": "TEA",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C4",
+      "tone": "self-roast",
+      "tags": [
+        "资源团",
+        "团队老妈子",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TEA-L5",
+      "text": "我喜欢用分带让对面来抓我，队友最好自己理解我的伟大。",
+      "plainText": "我喜欢用分带让对面来抓我，队友最好自己理解我的伟大。",
+      "funText": "我喜欢用分带让对面来抓我，队友最好自己理解我的伟大。",
+      "dimension": "TEA",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C5",
+      "tone": "self-roast",
+      "tags": [
+        "分带",
+        "边路自闭人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TEA-H5",
+      "text": "我喜欢用视野、保护和控制让队友打得舒服。",
+      "plainText": "我喜欢用视野、保护和控制让队友打得舒服。",
+      "funText": "我喜欢用视野、保护和控制让队友打得舒服。",
+      "dimension": "TEA",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C5",
+      "tone": "self-roast",
       "tags": [
         "保护",
+        "团队老妈子",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TEA-L6",
+      "text": "比起五个人抱团，我更享受一个人把对面地图撕开。",
+      "plainText": "比起五个人抱团，我更享受一个人把对面地图撕开。",
+      "funText": "比起五个人抱团，我更享受一个人把对面地图撕开。",
+      "dimension": "TEA",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C6",
+      "tone": "self-roast",
+      "tags": [
+        "拉扯",
+        "边路自闭人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TEA-H6",
+      "text": "我更享受团战里大家技能接起来的那种配合感。",
+      "plainText": "我更享受团战里大家技能接起来的那种配合感。",
+      "funText": "我更享受团战里大家技能接起来的那种配合感。",
+      "dimension": "TEA",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C6",
+      "tone": "self-roast",
+      "tags": [
         "团战",
-        "协作"
+        "团队老妈子",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TEA-L7",
+      "text": "我经常觉得“这局还是我自己来吧”。",
+      "plainText": "我经常觉得“这局还是我自己来吧”。",
+      "funText": "我经常觉得“这局还是我自己来吧”。",
+      "dimension": "TEA",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C7",
+      "tone": "self-roast",
+      "tags": [
+        "独C",
+        "边路自闭人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TEA-H7",
+      "text": "我会主动观察谁是队伍核心，然后围绕他打。",
+      "plainText": "我会主动观察谁是队伍核心，然后围绕他打。",
+      "funText": "我会主动观察谁是队伍核心，然后围绕他打。",
+      "dimension": "TEA",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C7",
+      "tone": "self-roast",
+      "tags": [
+        "核心",
+        "团队老妈子",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "TEA-L8",
+      "text": "我不太喜欢为了队友的失误买单。",
+      "plainText": "我不太喜欢为了队友的失误买单。",
+      "funText": "我不太喜欢为了队友的失误买单。",
+      "dimension": "TEA",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "TEA-C8",
+      "tone": "self-roast",
+      "tags": [
+        "失误",
+        "边路自闭人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "TEA-H8",
+      "text": "必要时我可以牺牲自己，帮团队换一个更大的胜利条件。",
+      "plainText": "必要时我可以牺牲自己，帮团队换一个更大的胜利条件。",
+      "funText": "必要时我可以牺牲自己，帮团队换一个更大的胜利条件。",
+      "dimension": "TEA",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "TEA-C8",
+      "tone": "self-roast",
+      "tags": [
+        "牺牲",
+        "团队老妈子",
+        "高分侧"
       ]
     },
     {
       "id": "EMO-L1",
-      "text": "被单杀或被抓以后，我通常会先补视野、控兵线和止损，而不是急着打回来。",
+      "text": "被单杀以后，我很容易想立刻打回来，不然这口气下不去。",
+      "plainText": "被单杀以后，我很容易想立刻打回来，不然这口气下不去。",
+      "funText": "被单杀以后，我很容易想立刻打回来，不然这口气下不去。",
       "dimension": "EMO",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "EMO-C1",
+      "tone": "self-roast",
       "tags": [
-        "抗压",
-        "止损",
-        "心态"
+        "单杀",
+        "冰箱人",
+        "低分侧"
       ]
     },
     {
       "id": "EMO-H1",
-      "text": "被单杀、被亮表情或被针对以后，我很容易想立刻找机会把场子打回来。",
+      "text": "被单杀以后，我通常会先止损，不急着用第二条命证明自己。",
+      "plainText": "被单杀以后，我通常会先止损，不急着用第二条命证明自己。",
+      "funText": "被单杀以后，我通常会先止损，不急着用第二条命证明自己。",
       "dimension": "EMO",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "EMO-C1",
+      "tone": "self-roast",
       "tags": [
-        "上头",
-        "报复",
-        "对抗"
+        "止损",
+        "一点就着",
+        "高分侧"
       ]
     },
     {
       "id": "EMO-L2",
-      "text": "优势时我也能稳住节奏，优先拿塔、视野和地图资源，不会只追求人头。",
+      "text": "优势的时候我会越打越兴奋，甚至想把对面泉水也纳入经营范围。",
+      "plainText": "优势的时候我会越打越兴奋，甚至想把对面泉水也纳入经营范围。",
+      "funText": "优势的时候我会越打越兴奋，甚至想把对面泉水也纳入经营范围。",
       "dimension": "EMO",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "EMO-C2",
+      "tone": "self-roast",
       "tags": [
         "优势",
-        "运营",
-        "稳定"
+        "冰箱人",
+        "低分侧"
       ]
     },
     {
       "id": "EMO-H2",
-      "text": "一旦打出优势，我会越打越凶，看到能追的人就很难收手。",
+      "text": "优势的时候我更愿意稳拿资源，不会因为爽就乱越塔。",
+      "plainText": "优势的时候我更愿意稳拿资源，不会因为爽就乱越塔。",
+      "funText": "优势的时候我更愿意稳拿资源，不会因为爽就乱越塔。",
       "dimension": "EMO",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "EMO-C2",
+      "tone": "self-roast",
       "tags": [
-        "追击",
-        "滚雪球",
-        "高波动"
+        "稳健",
+        "一点就着",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "EMO-L3",
+      "text": "队友连续失误时，我的心态会像小龙坑一样开始冒烟。",
+      "plainText": "队友连续失误时，我的心态会像小龙坑一样开始冒烟。",
+      "funText": "队友连续失误时，我的心态会像小龙坑一样开始冒烟。",
+      "dimension": "EMO",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C3",
+      "tone": "self-roast",
+      "tags": [
+        "队友",
+        "冰箱人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "EMO-H3",
+      "text": "队友连续失误时，我会先判断还能不能换资源，而不是一直纠结。",
+      "plainText": "队友连续失误时，我会先判断还能不能换资源，而不是一直纠结。",
+      "funText": "队友连续失误时，我会先判断还能不能换资源，而不是一直纠结。",
+      "dimension": "EMO",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C3",
+      "tone": "self-roast",
+      "tags": [
+        "运营",
+        "一点就着",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "EMO-L4",
+      "text": "看到残血从眼前跑掉，我真的很难说服自己不追。",
+      "plainText": "看到残血从眼前跑掉，我真的很难说服自己不追。",
+      "funText": "看到残血从眼前跑掉，我真的很难说服自己不追。",
+      "dimension": "EMO",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C4",
+      "tone": "self-roast",
+      "tags": [
+        "残血",
+        "冰箱人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "EMO-H4",
+      "text": "看到残血逃走时，如果视野不明，我能忍住不追。",
+      "plainText": "看到残血逃走时，如果视野不明，我能忍住不追。",
+      "funText": "看到残血逃走时，如果视野不明，我能忍住不追。",
+      "dimension": "EMO",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C4",
+      "tone": "self-roast",
+      "tags": [
+        "视野",
+        "一点就着",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "EMO-L5",
+      "text": "逆风时我会想找一波大的，把局面直接打回来。",
+      "plainText": "逆风时我会想找一波大的，把局面直接打回来。",
+      "funText": "逆风时我会想找一波大的，把局面直接打回来。",
+      "dimension": "EMO",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C5",
+      "tone": "self-roast",
+      "tags": [
+        "逆风",
+        "冰箱人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "EMO-H5",
+      "text": "逆风时我更愿意慢慢补发育、补视野、等对面犯错。",
+      "plainText": "逆风时我更愿意慢慢补发育、补视野、等对面犯错。",
+      "funText": "逆风时我更愿意慢慢补发育、补视野、等对面犯错。",
+      "dimension": "EMO",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C5",
+      "tone": "self-roast",
+      "tags": [
+        "等待",
+        "一点就着",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "EMO-L6",
+      "text": "对面亮表情或跳舞时，我很容易被点燃。",
+      "plainText": "对面亮表情或跳舞时，我很容易被点燃。",
+      "funText": "对面亮表情或跳舞时，我很容易被点燃。",
+      "dimension": "EMO",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C6",
+      "tone": "self-roast",
+      "tags": [
+        "嘲讽",
+        "冰箱人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "EMO-H6",
+      "text": "对面嘲讽时，我通常当作空气，继续做该做的事。",
+      "plainText": "对面嘲讽时，我通常当作空气，继续做该做的事。",
+      "funText": "对面嘲讽时，我通常当作空气，继续做该做的事。",
+      "dimension": "EMO",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C6",
+      "tone": "self-roast",
+      "tags": [
+        "冷处理",
+        "一点就着",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "EMO-L7",
+      "text": "我玩顺了会进入上头状态，觉得全地图都是我的舞台。",
+      "plainText": "我玩顺了会进入上头状态，觉得全地图都是我的舞台。",
+      "funText": "我玩顺了会进入上头状态，觉得全地图都是我的舞台。",
+      "dimension": "EMO",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C7",
+      "tone": "self-roast",
+      "tags": [
+        "上头",
+        "冰箱人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "EMO-H7",
+      "text": "我玩顺了也会提醒自己别送终结赏金。",
+      "plainText": "我玩顺了也会提醒自己别送终结赏金。",
+      "funText": "我玩顺了也会提醒自己别送终结赏金。",
+      "dimension": "EMO",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C7",
+      "tone": "self-roast",
+      "tags": [
+        "赏金",
+        "一点就着",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "EMO-L8",
+      "text": "我有时候不是想赢，就是想把刚刚那个人打回去。",
+      "plainText": "我有时候不是想赢，就是想把刚刚那个人打回去。",
+      "funText": "我有时候不是想赢，就是想把刚刚那个人打回去。",
+      "dimension": "EMO",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "EMO-C8",
+      "tone": "self-roast",
+      "tags": [
+        "复仇",
+        "冰箱人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "EMO-H8",
+      "text": "我更在意最后能不能赢，不太执着于单点复仇。",
+      "plainText": "我更在意最后能不能赢，不太执着于单点复仇。",
+      "funText": "我更在意最后能不能赢，不太执着于单点复仇。",
+      "dimension": "EMO",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "EMO-C8",
+      "tone": "self-roast",
+      "tags": [
+        "胜负",
+        "一点就着",
+        "高分侧"
       ]
     },
     {
       "id": "DEC-L1",
-      "text": "开团前我更愿意等队友技能、位置和视野都到位，不喜欢一个人先冲。",
+      "text": "机会一出现我会立刻上，晚半秒都觉得灵魂被锁住。",
+      "plainText": "机会一出现我会立刻上，晚半秒都觉得灵魂被锁住。",
+      "funText": "机会一出现我会立刻上，晚半秒都觉得灵魂被锁住。",
       "dimension": "DEC",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "DEC-C1",
+      "tone": "self-roast",
       "tags": [
-        "谨慎",
-        "开团",
-        "视野"
+        "秒开",
+        "等一等大师",
+        "低分侧"
       ]
     },
     {
       "id": "DEC-H1",
-      "text": "只要看到对方 C 位走位失误，我会立刻闪现或位移开团，不想错过窗口。",
+      "text": "我会等队友距离、视野和关键技能到位后再开。",
+      "plainText": "我会等队友距离、视野和关键技能到位后再开。",
+      "funText": "我会等队友距离、视野和关键技能到位后再开。",
       "dimension": "DEC",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "DEC-C1",
+      "tone": "self-roast",
       "tags": [
-        "果断",
-        "强开",
-        "窗口"
+        "等人",
+        "我先上了",
+        "高分侧"
       ]
     },
     {
       "id": "DEC-L2",
-      "text": "如果一次击杀机会不够确定，我宁愿放弃，换取更稳的兵线、视野或资源。",
+      "text": "我很容易成为第一个闪现进场的人。",
+      "plainText": "我很容易成为第一个闪现进场的人。",
+      "funText": "我很容易成为第一个闪现进场的人。",
       "dimension": "DEC",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "DEC-C2",
+      "tone": "self-roast",
       "tags": [
-        "风险控制",
-        "资源",
-        "后手"
+        "闪现",
+        "等一等大师",
+        "低分侧"
       ]
     },
     {
       "id": "DEC-H2",
-      "text": "我能接受先手失败的风险，因为很多机会只出现一瞬间，犹豫就没了。",
+      "text": "我更习惯先观察对面站位，确认不是钓鱼再动手。",
+      "plainText": "我更习惯先观察对面站位，确认不是钓鱼再动手。",
+      "funText": "我更习惯先观察对面站位，确认不是钓鱼再动手。",
       "dimension": "DEC",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "DEC-C2",
+      "tone": "self-roast",
       "tags": [
-        "风险",
-        "瞬间决策",
-        "先手"
+        "钓鱼",
+        "我先上了",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "DEC-L3",
+      "text": "短窗口里我宁愿赌一波，也不想看着机会消失。",
+      "plainText": "短窗口里我宁愿赌一波，也不想看着机会消失。",
+      "funText": "短窗口里我宁愿赌一波，也不想看着机会消失。",
+      "dimension": "DEC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C3",
+      "tone": "self-roast",
+      "tags": [
+        "短窗口",
+        "等一等大师",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "DEC-H3",
+      "text": "窗口太短时，我宁愿放掉，也不想把局面送崩。",
+      "plainText": "窗口太短时，我宁愿放掉，也不想把局面送崩。",
+      "funText": "窗口太短时，我宁愿放掉，也不想把局面送崩。",
+      "dimension": "DEC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C3",
+      "tone": "self-roast",
+      "tags": [
+        "放弃",
+        "我先上了",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "DEC-L4",
+      "text": "我开团时经常是“我先上了，你们看着办”。",
+      "plainText": "我开团时经常是“我先上了，你们看着办”。",
+      "funText": "我开团时经常是“我先上了，你们看着办”。",
+      "dimension": "DEC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C4",
+      "tone": "self-roast",
+      "tags": [
+        "开团",
+        "等一等大师",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "DEC-H4",
+      "text": "我开团前会先确认队友真的能跟，不想一个人表演入土。",
+      "plainText": "我开团前会先确认队友真的能跟，不想一个人表演入土。",
+      "funText": "我开团前会先确认队友真的能跟，不想一个人表演入土。",
+      "dimension": "DEC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C4",
+      "tone": "self-roast",
+      "tags": [
+        "跟进",
+        "我先上了",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "DEC-L5",
+      "text": "对面走位露出破绽时，我会很快按下关键技能。",
+      "plainText": "对面走位露出破绽时，我会很快按下关键技能。",
+      "funText": "对面走位露出破绽时，我会很快按下关键技能。",
+      "dimension": "DEC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C5",
+      "tone": "self-roast",
+      "tags": [
+        "破绽",
+        "等一等大师",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "DEC-H5",
+      "text": "对面露破绽时，我会先判断他身后有没有队友。",
+      "plainText": "对面露破绽时，我会先判断他身后有没有队友。",
+      "funText": "对面露破绽时，我会先判断他身后有没有队友。",
+      "dimension": "DEC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C5",
+      "tone": "self-roast",
+      "tags": [
+        "埋伏",
+        "我先上了",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "DEC-L6",
+      "text": "我不太喜欢一直拉扯，能打就赶紧打。",
+      "plainText": "我不太喜欢一直拉扯，能打就赶紧打。",
+      "funText": "我不太喜欢一直拉扯，能打就赶紧打。",
+      "dimension": "DEC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C6",
+      "tone": "self-roast",
+      "tags": [
+        "拉扯",
+        "等一等大师",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "DEC-H6",
+      "text": "我能接受长时间拉扯，等最舒服的一波再打。",
+      "plainText": "我能接受长时间拉扯，等最舒服的一波再打。",
+      "funText": "我能接受长时间拉扯，等最舒服的一波再打。",
+      "dimension": "DEC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C6",
+      "tone": "self-roast",
+      "tags": [
+        "耐心",
+        "我先上了",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "DEC-L7",
+      "text": "残局里我会凭第一反应做决定。",
+      "plainText": "残局里我会凭第一反应做决定。",
+      "funText": "残局里我会凭第一反应做决定。",
+      "dimension": "DEC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C7",
+      "tone": "self-roast",
+      "tags": [
+        "残局",
+        "等一等大师",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "DEC-H7",
+      "text": "残局里我会先看技能、血量和地形，再决定追还是撤。",
+      "plainText": "残局里我会先看技能、血量和地形，再决定追还是撤。",
+      "funText": "残局里我会先看技能、血量和地形，再决定追还是撤。",
+      "dimension": "DEC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C7",
+      "tone": "self-roast",
+      "tags": [
+        "判断",
+        "我先上了",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "DEC-L8",
+      "text": "我觉得犹豫经常比失误更可怕。",
+      "plainText": "我觉得犹豫经常比失误更可怕。",
+      "funText": "我觉得犹豫经常比失误更可怕。",
+      "dimension": "DEC",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "DEC-C8",
+      "tone": "self-roast",
+      "tags": [
+        "犹豫",
+        "等一等大师",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "DEC-H8",
+      "text": "我觉得很多失误都来自太快把自己交出去。",
+      "plainText": "我觉得很多失误都来自太快把自己交出去。",
+      "funText": "我觉得很多失误都来自太快把自己交出去。",
+      "dimension": "DEC",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "DEC-C8",
+      "tone": "self-roast",
+      "tags": [
+        "失误",
+        "我先上了",
+        "高分侧"
       ]
     },
     {
       "id": "PRE-L1",
-      "text": "我更喜欢女警、发条、布隆这类定位清楚、打法稳定、职责明确的英雄。",
+      "text": "我容易被亚索、劫、薇恩这类高风险英雄吸引，哪怕战绩会很有节目效果。",
+      "plainText": "我容易被亚索、劫、薇恩这类高风险英雄吸引，哪怕战绩会很有节目效果。",
+      "funText": "我容易被亚索、劫、薇恩这类高风险英雄吸引，哪怕战绩会很有节目效果。",
       "dimension": "PRE",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "PRE-C1",
+      "tone": "self-roast",
       "tags": [
-        "传统",
-        "稳定",
-        "模板"
+        "高风险",
+        "老实英雄人",
+        "低分侧"
       ]
     },
     {
       "id": "PRE-H1",
-      "text": "我会被亚索、薇恩、劫、阿卡丽这类高风险高上限英雄吸引，即使更容易失误。",
+      "text": "我更喜欢女警、发条、希维尔这类职责清楚、输出稳定的英雄。",
+      "plainText": "我更喜欢女警、发条、希维尔这类职责清楚、输出稳定的英雄。",
+      "funText": "我更喜欢女警、发条、希维尔这类职责清楚、输出稳定的英雄。",
       "dimension": "PRE",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "PRE-C1",
+      "tone": "self-roast",
       "tags": [
-        "高上限",
-        "高风险",
-        "操作"
+        "稳定",
+        "机制上瘾者",
+        "高分侧"
       ]
     },
     {
       "id": "PRE-L2",
-      "text": "选英雄时，我更在意阵容职责是否清楚、输出位置是否安全、容错率是否足够。",
+      "text": "英雄越难，我越想证明自己不是一般人。",
+      "plainText": "英雄越难，我越想证明自己不是一般人。",
+      "funText": "英雄越难，我越想证明自己不是一般人。",
       "dimension": "PRE",
       "reverse": false,
       "polarity": "low",
       "weight": 1,
       "consistencyPairId": "PRE-C2",
+      "tone": "self-roast",
       "tags": [
-        "阵容",
-        "容错",
-        "安全输出"
+        "难度",
+        "老实英雄人",
+        "低分侧"
       ]
     },
     {
       "id": "PRE-H2",
-      "text": "我愿意为了机制复杂、极限拉扯或个人秀空间，选择更难驾驭的英雄。",
+      "text": "英雄越稳定，我越觉得这把排位像一个正常项目。",
+      "plainText": "英雄越稳定，我越觉得这把排位像一个正常项目。",
+      "funText": "英雄越稳定，我越觉得这把排位像一个正常项目。",
       "dimension": "PRE",
       "reverse": true,
       "polarity": "high",
       "weight": 1,
       "consistencyPairId": "PRE-C2",
+      "tone": "self-roast",
+      "tags": [
+        "稳定",
+        "机制上瘾者",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "PRE-L3",
+      "text": "我愿意为了一个帅的操作练很久。",
+      "plainText": "我愿意为了一个帅的操作练很久。",
+      "funText": "我愿意为了一个帅的操作练很久。",
+      "dimension": "PRE",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C3",
+      "tone": "self-roast",
+      "tags": [
+        "帅",
+        "老实英雄人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "PRE-H3",
+      "text": "我更看重英雄能不能稳定赢，而不是操作看起来帅不帅。",
+      "plainText": "我更看重英雄能不能稳定赢，而不是操作看起来帅不帅。",
+      "funText": "我更看重英雄能不能稳定赢，而不是操作看起来帅不帅。",
+      "dimension": "PRE",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C3",
+      "tone": "self-roast",
+      "tags": [
+        "赢",
+        "机制上瘾者",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "PRE-L4",
+      "text": "我喜欢有位移、有反杀、有上限的英雄。",
+      "plainText": "我喜欢有位移、有反杀、有上限的英雄。",
+      "funText": "我喜欢有位移、有反杀、有上限的英雄。",
+      "dimension": "PRE",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C4",
+      "tone": "self-roast",
+      "tags": [
+        "位移",
+        "老实英雄人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "PRE-H4",
+      "text": "我喜欢站位清楚、机制直观、团队容易理解的英雄。",
+      "plainText": "我喜欢站位清楚、机制直观、团队容易理解的英雄。",
+      "funText": "我喜欢站位清楚、机制直观、团队容易理解的英雄。",
+      "dimension": "PRE",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C4",
+      "tone": "self-roast",
+      "tags": [
+        "直观",
+        "机制上瘾者",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "PRE-L5",
+      "text": "我不怕英雄失误成本高，怕的是英雄没有想象空间。",
+      "plainText": "我不怕英雄失误成本高，怕的是英雄没有想象空间。",
+      "funText": "我不怕英雄失误成本高，怕的是英雄没有想象空间。",
+      "dimension": "PRE",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C5",
+      "tone": "self-roast",
+      "tags": [
+        "上限",
+        "老实英雄人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "PRE-H5",
+      "text": "我不太喜欢失误成本过高的英雄，容错率会让我安心。",
+      "plainText": "我不太喜欢失误成本过高的英雄，容错率会让我安心。",
+      "funText": "我不太喜欢失误成本过高的英雄，容错率会让我安心。",
+      "dimension": "PRE",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C5",
+      "tone": "self-roast",
+      "tags": [
+        "容错",
+        "机制上瘾者",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "PRE-L6",
+      "text": "我会因为一个英雄能秀，就忍受它前期坐牢。",
+      "plainText": "我会因为一个英雄能秀，就忍受它前期坐牢。",
+      "funText": "我会因为一个英雄能秀，就忍受它前期坐牢。",
+      "dimension": "PRE",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C6",
+      "tone": "self-roast",
+      "tags": [
+        "坐牢",
+        "老实英雄人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "PRE-H6",
+      "text": "如果一个英雄前期太难受，我很难长期坚持。",
+      "plainText": "如果一个英雄前期太难受，我很难长期坚持。",
+      "funText": "如果一个英雄前期太难受，我很难长期坚持。",
+      "dimension": "PRE",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C6",
+      "tone": "self-roast",
+      "tags": [
+        "舒适",
+        "机制上瘾者",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "PRE-L7",
+      "text": "我喜欢英雄机制复杂一点，最好能让我打出个人签名。",
+      "plainText": "我喜欢英雄机制复杂一点，最好能让我打出个人签名。",
+      "funText": "我喜欢英雄机制复杂一点，最好能让我打出个人签名。",
+      "dimension": "PRE",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C7",
+      "tone": "self-roast",
       "tags": [
         "机制",
-        "拉扯",
-        "个人秀"
+        "老实英雄人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "PRE-H7",
+      "text": "我喜欢英雄机制简单可靠，别让我每局都像期末考试。",
+      "plainText": "我喜欢英雄机制简单可靠，别让我每局都像期末考试。",
+      "funText": "我喜欢英雄机制简单可靠，别让我每局都像期末考试。",
+      "dimension": "PRE",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C7",
+      "tone": "self-roast",
+      "tags": [
+        "简单",
+        "机制上瘾者",
+        "高分侧"
+      ]
+    },
+    {
+      "id": "PRE-L8",
+      "text": "我愿意在匹配或排位里尝试冷门理解。",
+      "plainText": "我愿意在匹配或排位里尝试冷门理解。",
+      "funText": "我愿意在匹配或排位里尝试冷门理解。",
+      "dimension": "PRE",
+      "reverse": false,
+      "polarity": "low",
+      "weight": 1,
+      "consistencyPairId": "PRE-C8",
+      "tone": "self-roast",
+      "tags": [
+        "冷门",
+        "老实英雄人",
+        "低分侧"
+      ]
+    },
+    {
+      "id": "PRE-H8",
+      "text": "我更愿意选择版本稳定答案，不喜欢拿队友心态做实验。",
+      "plainText": "我更愿意选择版本稳定答案，不喜欢拿队友心态做实验。",
+      "funText": "我更愿意选择版本稳定答案，不喜欢拿队友心态做实验。",
+      "dimension": "PRE",
+      "reverse": true,
+      "polarity": "high",
+      "weight": 1,
+      "consistencyPairId": "PRE-C8",
+      "tone": "self-roast",
+      "tags": [
+        "版本",
+        "机制上瘾者",
+        "高分侧"
       ]
     }
   ]

@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <meta name="description"
-    content="MGTI 英雄联盟人格测试 - 基于 My Game Type Indicator 五维游戏人格体系，通过战术风格、团队角色、情绪反应、决策速度与英雄偏好，匹配与你最契合的本命英雄。">
+    content="MGTI 峡谷人格发疯测试 - 先做 20 道基础题，可选择继续追加题目，测出你的峡谷精神状态、本命英雄和五维游戏人格。">
   <meta name="keywords" content="英雄联盟,MGTI,My Game Type Indicator,人格测试,英雄联盟测试,本命英雄,符文之地,游戏人格,LOL测试,英雄匹配">
   <meta name="author" content="MGTI Project">
   <meta name="robots" content="index,follow">
@@ -14,8 +14,8 @@
   <meta name="format-detection" content="telephone=no">
 
   <meta property="og:site_name" content="MGTI · My Game Type Indicator">
-  <meta property="og:title" content="MGTI · 英雄联盟人格测试 · 召唤你的本命英雄">
-  <meta property="og:description" content="回答游戏行为题，生成你的 TAC / TEA / EMO / DEC / PRE 五维人格画像，并匹配最契合你的英雄联盟本命英雄。">
+  <meta property="og:title" content="MGTI · 峡谷人格发疯测试 · 测出你的本命英雄">
+  <meta property="og:description" content="先回答 20 道基础题，也可以继续追加题目，测出你的峡谷人格、本命英雄和一点扎心诊断。">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="zh_CN">
   <meta property="og:url" content="/MGTI/">
@@ -29,7 +29,7 @@
   <meta name="twitter:description" content="通过五维游戏行为画像，匹配你的本命英雄。">
   <meta name="twitter:image" content="/MGTI/assets/og/mgti-og.png">
 
-  <title>MGTI · 英雄联盟人格测试 · 召唤你的本命英雄</title>
+  <title>MGTI · 峡谷人格发疯测试 · 测出你的本命英雄</title>
 
   <link rel="canonical" href="/MGTI/">
   <link rel="manifest" href="manifest.json">
@@ -55,7 +55,7 @@
       <div class="content-wrapper">
         <header class="brand">
           <h1>MGTI</h1>
-          <p>英雄联盟 · 五维游戏人格测试</p>
+          <p>英雄联盟 · 峡谷人格发疯测试</p>
           <div class="brand-sub">—— My Game Type Indicator ——</div>
         </header>
 
@@ -63,16 +63,16 @@
           <div
             style="background: rgba(30, 38, 48, 0.82); border: 1px solid rgba(226, 184, 107, 0.25); border-radius: 24px; padding: 1rem 1.2rem; color: #c0cfdf; font-size: 0.9rem; line-height: 1.7; backdrop-filter: blur(10px);">
             <p>
-              通过游戏行为题，系统会计算你的
+              先通过 20 道基础题，系统会一边认真计算你的
               <strong style="color:#e2b86b;">战术风格</strong>、
               <strong style="color:#e2b86b;">团队角色</strong>、
               <strong style="color:#e2b86b;">情绪反应</strong>、
               <strong style="color:#e2b86b;">决策速度</strong>、
               <strong style="color:#e2b86b;">英雄偏好</strong>
-              五维画像，并从英雄图鉴中匹配与你最契合的本命英雄。
+              五维画像，一边把它翻译成更适合截图转发的峡谷人格，并匹配与你最契合的本命英雄。
             </p>
             <p style="margin-top: 0.65rem; color: #8d9db0;">
-              题目包含正向题、反向题与一致性校验。结果页会解释每个维度的高低含义，并给出更具体的英雄打法建议。
+              题库保留 80 道候选题。你先完成 20 道基础题后，可以直接出结果，也可以继续追加题目。做得越多，五维均值越稳定，英雄匹配越贴近完整算法。结果不是严肃心理诊断，而是“准确一点、好笑一点、扎心一点”的游戏人格整活。
             </p>
           </div>
         </section>
@@ -80,25 +80,20 @@
         <section class="intro-card" aria-label="五维说明" style="margin-bottom: 1.5rem;">
           <div
             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; font-size: 0.78rem; color: #c0cfdf;">
-            <div
-              style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
-              <strong style="color:#e2b86b;">TAC</strong><br>直觉操作 ↔ 谋略计算
+            <div style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
+              <strong style="color:#e2b86b;">TAC</strong><br>手感怪 ↔ 算盘精
             </div>
-            <div
-              style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
-              <strong style="color:#e2b86b;">TEA</strong><br>单带独行 ↔ 团队协同
+            <div style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
+              <strong style="color:#e2b86b;">TEA</strong><br>边路自闭 ↔ 团队老妈子
             </div>
-            <div
-              style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
-              <strong style="color:#e2b86b;">EMO</strong><br>冷静运营 ↔ 激情上头
+            <div style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
+              <strong style="color:#e2b86b;">EMO</strong><br>峡谷冰箱 ↔ 红温艺术家
             </div>
-            <div
-              style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
-              <strong style="color:#e2b86b;">DEC</strong><br>等待时机 ↔ 果断开打
+            <div style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
+              <strong style="color:#e2b86b;">DEC</strong><br>等一等大师 ↔ 我先上了
             </div>
-            <div
-              style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
-              <strong style="color:#e2b86b;">PRE</strong><br>传统稳定 ↔ 高危高秀
+            <div style="background: rgba(20,28,38,.62); border: 1px solid rgba(226,184,107,.18); border-radius: 16px; padding: .75rem;">
+              <strong style="color:#e2b86b;">PRE</strong><br>老实英雄人 ↔ 机制上瘾者
             </div>
           </div>
         </section>
@@ -128,7 +123,7 @@
 
         <footer style="text-align: center; margin-top: 2rem; font-size: 0.75rem; opacity: 0.65;">
           <p>⚔️ MGTI · My Game Type Indicator</p>
-          <p>基于英雄联盟世界观与英雄机制的五维游戏人格测试，仅供娱乐与人格探索。</p>
+          <p>基于英雄联盟世界观、英雄机制与玩家发疯行为的五维游戏人格测试，仅供娱乐与截图。</p>
         </footer>
       </div>
     </main>
