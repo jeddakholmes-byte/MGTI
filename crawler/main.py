@@ -3,15 +3,19 @@ import json
 import os
 import time
 import random
+import re
 from typing import List, Dict, Optional
 from dataclasses import dataclass, asdict
 
 # ==================== 配置 ====================
-# 腾讯官方API
+# 腾讯官方API（用于头像、原画、基础信息）
 HERO_LIST_API = "https://game.gtimg.cn/images/lol/act/img/js/heroList/hero_list.js"
 HERO_DETAIL_API_TEMPLATE = "https://game.gtimg.cn/images/lol/act/img/js/hero/{}.js"
 
-# 请求延迟范围（秒）
+# 英雄联盟宇宙API（用于故事）
+UNIVERSE_BASE = "https://yz.lol.qq.com/v1/zh_cn"
+CHAMPION_API_TEMPLATE = f"{UNIVERSE_BASE}/champions/{{}}/index.json"
+
 MIN_DELAY = 0.3
 MAX_DELAY = 0.8
 
@@ -22,24 +26,22 @@ USER_AGENTS = [
 
 @dataclass
 class Champion:
-    """英雄数据模型"""
-    id: str                # 英雄ID (数字)
-    name: str              # 英雄名称
-    title: str             # 称号
-    alias: str             # 英文ID (如 "Annie")
-    story: str             # 背景故事
-    roles: List[str]       # 定位 (如 ["法师", "刺客"])
-    tags: List[str]        # 标签 (官方分类)
-    release_date: str      # 上线日期
-    image_url: str         # 头像URL
-    splash_url: str        # 原画URL
+    id: str
+    name: str
+    title: str
+    alias: str
+    story: str
+    roles: List[str]
+    tags: List[str]
+    release_date: str
+    image_url: str
+    splash_url: str
     mbti: Optional[str] = None
 
 def get_random_headers() -> Dict[str, str]:
     return {"User-Agent": random.choice(USER_AGENTS)}
 
 def safe_request(url: str, retries: int = 3) -> Optional[Dict]:
-    """安全发送请求，自动重试"""
     for attempt in range(retries):
         try:
             response = requests.get(url, headers=get_random_headers(), timeout=15)
@@ -53,8 +55,7 @@ def safe_request(url: str, retries: int = 3) -> Optional[Dict]:
     return None
 
 def get_hero_list() -> List[Dict]:
-    """获取所有英雄的基础信息（包含英雄ID、名称、alias等）"""
-    print("📋 [1/2] 从腾讯官方接口获取英雄列表...")
+    print("📋 [1/3] 从腾讯官方接口获取英雄列表...")
     data = safe_request(HERO_LIST_API)
     if not data or "hero" not in data:
         print("  ❌ 获取英雄列表失败")
@@ -63,103 +64,91 @@ def get_hero_list() -> List[Dict]:
     print(f"  ✅ 共获取到 {len(heroes)} 个英雄")
     return heroes
 
-def get_hero_detail(hero_id: str) -> Optional[Dict]:
-    """通过英雄ID获取详细信息（故事、皮肤、标签等）"""
-    url = HERO_DETAIL_API_TEMPLATE.format(hero_id)
+def get_universe_story(alias: str) -> str:
+    """从英雄联盟宇宙API获取故事（使用 yz.lol.qq.com）"""
+    if not alias:
+        return "暂无故事数据"
+    url = CHAMPION_API_TEMPLATE.format(alias.lower())
     data = safe_request(url)
-    if not data or "hero" not in data:
-        return None
-    return data
-
-def extract_story(hero_detail: Dict) -> str:
-    """提取故事文本，清理HTML标签"""
-    hero_info = hero_detail.get("hero", {})
-    story = hero_info.get("story", "暂无故事数据")
+    if not data or "champion" not in data:
+        return "暂无故事数据"
+    champion_data = data["champion"]
+    biography = champion_data.get("biography", {})
+    story = biography.get("full") or biography.get("concise") or ""
     if story:
-        # 简单清理HTML标签，保留段落分隔
-        story = story.replace("<br>", "\n").replace("<br/>", "\n")
-        story = story.replace("<p>", "").replace("</p>", "\n")
-        # 移除其他可能的标签（可选）
-        import re
+        # 清理可能存在的HTML标签，保留段落分隔
+        story = re.sub(r'<br\s*/?>', '\n', story)
+        story = re.sub(r'</p>', '\n', story)
         story = re.sub(r'<[^>]+>', '', story)
-    return story.strip()
+        story = re.sub(r'\n\s*\n', '\n\n', story)
+        return story.strip()
+    return "暂无故事数据"
 
-def get_images(hero_detail: Dict, hero_alias: str) -> tuple:
-    """
-    从详情中提取头像和原画URL
-    优先使用经典皮肤（isBase == '1'）的图片
-    返回 (image_url, splash_url)
-    """
+def get_images_from_tencent(hero_detail: Dict, hero_alias: str) -> tuple:
+    """从腾讯API详情中提取头像和原画URL"""
     skins = hero_detail.get("skins", [])
     if not skins:
-        # 降级：使用基于alias的默认URL
         default_avatar = f"https://game.gtimg.cn/images/lol/act/img/champion/{hero_alias}.png"
         default_splash = f"https://game.gtimg.cn/images/lol/act/img/skin/big/{hero_alias}000.jpg"
         return default_avatar, default_splash
 
-    # 查找经典皮肤 (isBase == '1')
     classic = next((s for s in skins if s.get("isBase") == "1"), skins[0])
     avatar_url = classic.get("iconImg", "")
     splash_url = classic.get("mainImg", "")
-    
-    # 若缺少原画，尝试使用 chromaImg
     if not splash_url:
         splash_url = classic.get("chromaImg", "")
-    
-    # 如果仍然没有，使用基于alias的默认URL
     if not avatar_url:
         avatar_url = f"https://game.gtimg.cn/images/lol/act/img/champion/{hero_alias}.png"
     if not splash_url:
         splash_url = f"https://game.gtimg.cn/images/lol/act/img/skin/big/{hero_alias}000.jpg"
-    
     return avatar_url, splash_url
 
 def main():
     print("=" * 60)
-    print("🌈 MGTI 英雄联盟英雄数据爬虫 (腾讯官方API版)")
-    print("获取英雄列表、故事、头像及原画")
+    print("🌈 MGTI 英雄联盟英雄数据爬虫 (混合版)")
+    print("头像/原画来自腾讯API，故事来自英雄联盟宇宙API")
     print("=" * 60)
     
-    # Step 1: 获取英雄列表
     heroes = get_hero_list()
     if not heroes:
-        print("❌ 爬取终止：无法获取英雄列表")
+        print("❌ 爬取终止")
         return
     
     total = len(heroes)
     champions_data = []
     
-    print(f"\n📥 [2/2] 开始获取每个英雄的详细信息...")
-    print(f"共 {total} 个英雄，预计需要 {total * (MIN_DELAY + MAX_DELAY) / 2:.0f} 秒\n")
+    print(f"\n📥 [2/3] 获取腾讯API详情（用于头像原画）...")
+    print(f"📥 [3/3] 获取宇宙API故事...")
+    print(f"共 {total} 个英雄\n")
     
     for idx, hero in enumerate(heroes, 1):
         hero_id = hero.get("heroId")
         name = hero.get("name")
-        alias = hero.get("alias")      # 英文ID，如 "Annie"
+        alias = hero.get("alias")  # 例如 "Annie"
         title = hero.get("title")
-        roles = hero.get("roles", [])  # 定位列表
-        tags = hero.get("tags", [])    # 标签列表
-        release_date = hero.get("sellTime", "")  # 上线时间
+        roles = hero.get("roles", [])
+        tags = hero.get("tags", [])
+        release_date = hero.get("sellTime", "")
         
         if not hero_id:
-            print(f"[{idx}/{total}] 跳过: {name} (缺少 heroId)")
+            print(f"[{idx}/{total}] 跳过: {name}")
             continue
         
         print(f"[{idx}/{total}] 正在处理: {name} ({alias})")
         
-        # 获取详情
-        detail = get_hero_detail(hero_id)
+        # 1. 从腾讯API获取详情（为了头像原画）
+        detail = safe_request(HERO_DETAIL_API_TEMPLATE.format(hero_id))
         time.sleep(random.uniform(MIN_DELAY, MAX_DELAY))
         
-        if not detail:
-            print(f"  ⚠️ 详情获取失败，使用基础数据")
-            story = "暂无故事数据"
-            avatar_url, splash_url = get_images({}, alias)
+        if detail:
+            avatar_url, splash_url = get_images_from_tencent(detail, alias)
         else:
-            story = extract_story(detail)
-            avatar_url, splash_url = get_images(detail, alias)
+            avatar_url = f"https://game.gtimg.cn/images/lol/act/img/champion/{alias}.png"
+            splash_url = f"https://game.gtimg.cn/images/lol/act/img/skin/big/{alias}000.jpg"
         
-        # 构建数据对象
+        # 2. 从宇宙API获取故事
+        story = get_universe_story(alias)
+        
         champ = Champion(
             id=hero_id,
             name=name,
@@ -178,7 +167,6 @@ def main():
         if idx % 20 == 0:
             print(f"  📊 进度: {idx}/{total} ({idx/total*100:.1f}%)")
     
-    # 保存数据
     output_dir = os.path.join(os.path.dirname(__file__), "../data")
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "champions.json")
@@ -187,8 +175,7 @@ def main():
         json.dump(champions_data, f, ensure_ascii=False, indent=2)
     
     print("\n" + "=" * 60)
-    print(f"✅ 爬取完成！")
-    print(f"📊 共处理: {len(champions_data)} 个英雄")
+    print(f"✅ 爬取完成！共 {len(champions_data)} 个英雄")
     print(f"📁 数据保存至: {output_path}")
     print("=" * 60)
 

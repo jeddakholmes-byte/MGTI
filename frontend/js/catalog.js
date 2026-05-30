@@ -3,7 +3,7 @@ let allChampions = [];
 
 // 初始化图鉴页面
 async function initCatalog() {
-  allChampions = await loadChampions();  // loadChampions 来自 data.js
+  allChampions = await loadChampions();
   renderChampionGrid(allChampions);
   setupFilters();
 }
@@ -21,7 +21,6 @@ function renderChampionGrid(champions) {
   let html = '';
   champions.forEach(champ => {
     const storyPlain = champ.story ? champ.story.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : '暂无故事';
-    // 确保头像 URL 存在，否则使用默认占位图
     const avatarUrl = champ.image_url || 'https://ddragon.leagueoflegends.com/cdn/15.5.1/img/champion/default.png';
 
     html += `
@@ -59,13 +58,17 @@ function escapeHtml(str) {
   });
 }
 
-// 设置搜索和筛选监听
+// 设置搜索和筛选监听（支持别名）
 function setupFilters() {
   const searchInput = document.getElementById('search-input');
   const mbtiSelect = document.getElementById('mbti-filter');
 
   const filter = () => {
-    const keyword = searchInput.value.toLowerCase().trim();
+    let keyword = searchInput.value.toLowerCase().trim();
+    // 别名转换：如果输入词在别名映射中，替换为标准名称
+    if (window.heroAliasMap && window.heroAliasMap[keyword]) {
+      keyword = window.heroAliasMap[keyword];
+    }
     const mbtiFilter = mbtiSelect.value;
     let filtered = allChampions.filter(c => {
       const matchName = keyword === '' || c.name.toLowerCase().includes(keyword);
@@ -81,7 +84,6 @@ function setupFilters() {
 
 // 显示英雄详情模态框（含原画）
 function showDetailModal(champion) {
-  // 获取或创建模态框
   let modal = document.querySelector('.modal');
   if (!modal) {
     modal = document.createElement('div');
@@ -101,7 +103,6 @@ function showDetailModal(champion) {
 
   const bodyDiv = modal.querySelector('#modal-body');
   const storyFull = champion.story ? champion.story.replace(/<[^>]*>/g, '') : '没有详细故事';
-  // 优先使用原画 splash_url，若没有则使用头像
   const splashUrl = champion.splash_url || champion.image_url || 'https://via.placeholder.com/1920x1080?text=No+Splash';
 
   bodyDiv.innerHTML = `

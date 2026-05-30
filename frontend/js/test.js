@@ -1,6 +1,4 @@
 // ==================== 题库 ====================
-// 每个维度（I/E, N/S, T/F, J/P）各 5 题，共 20 题
-// 选项采用五点量表，分值：非常同意 +2，同意 +1，中立 0，不同意 -1，非常不同意 -2
 const questions = [
   // I/E 维度 (外向 E 为正，内向 I 为负)
   { text: "我喜欢成为派对或聚会的焦点。", dimension: "I/E", reverse: false },
@@ -40,12 +38,10 @@ const options = [
   { label: "非常不同意", value: -2 }
 ];
 
-// 状态变量
 let currentIndex = 0;
 let scores = { "I/E": 0, "N/S": 0, "T/F": 0, "J/P": 0 };
 let totalQuestions = questions.length;
 
-// 渲染当前题目
 function renderQuestion() {
   const q = questions[currentIndex];
   const container = document.getElementById('question-area');
@@ -69,11 +65,10 @@ function renderQuestion() {
   });
 }
 
-// 处理答案
 function handleAnswer(rawValue) {
   const q = questions[currentIndex];
   let score = rawValue;
-  if (q.reverse) score = -score;   // 反向题反转分数
+  if (q.reverse) score = -score;
   scores[q.dimension] += score;
 
   currentIndex++;
@@ -84,9 +79,7 @@ function handleAnswer(rawValue) {
   }
 }
 
-// 计算用户最终维度得分（范围 -5 到 +5）
 function getUserVector() {
-  // 每个维度总分范围 -10 到 +10，除以2得到 -5..+5
   const ie = scores["I/E"] / 2;
   const ns = scores["N/S"] / 2;
   const tf = scores["T/F"] / 2;
@@ -94,7 +87,6 @@ function getUserVector() {
   return { I: -ie, E: ie, N: ns, S: -ns, T: tf, F: -tf, J: jp, P: -jp };
 }
 
-// 将 MBTI 四字母转换为理想向量（每个维度值 0 或 1）
 function mbtiToVector(mbti) {
   if (!mbti || mbti.length !== 4) return null;
   const [ie, ns, tf, jp] = mbti.split('');
@@ -106,7 +98,6 @@ function mbtiToVector(mbti) {
   };
 }
 
-// 计算两个向量的余弦相似度（范围 0~1）
 function cosineSimilarity(vecA, vecB) {
   let dot = 0, magA = 0, magB = 0;
   for (let key in vecA) {
@@ -118,7 +109,6 @@ function cosineSimilarity(vecA, vecB) {
   return dot / (Math.sqrt(magA) * Math.sqrt(magB));
 }
 
-// 匹配英雄（基于余弦相似度，从前5名中随机选择）
 function findBestMatch(userVec, champions) {
   const withSim = champions
     .filter(c => c.mbti && c.mbti !== '未知' && c.mbti.length === 4)
@@ -131,7 +121,6 @@ function findBestMatch(userVec, champions) {
     .filter(item => item !== null);
 
   if (withSim.length === 0) return null;
-
   withSim.sort((a, b) => b.similarity - a.similarity);
   const topN = Math.min(5, withSim.length);
   const topCandidates = withSim.slice(0, topN);
@@ -139,7 +128,6 @@ function findBestMatch(userVec, champions) {
   return topCandidates[randomIndex].champion;
 }
 
-// 完成测试并显示结果
 function finishTest() {
   const userVec = getUserVector();
   if (!championsData.length) {
@@ -148,11 +136,9 @@ function finishTest() {
   }
   const matched = findBestMatch(userVec, championsData);
   if (!matched) {
-    // 降级：随机选一个英雄
     const fallback = championsData[Math.floor(Math.random() * championsData.length)];
     displayResult(fallback, "计算失败");
   } else {
-    // 生成 MBTI 字母（基于用户得分）
     const ie = scores["I/E"] >= 0 ? "E" : "I";
     const ns = scores["N/S"] >= 0 ? "N" : "S";
     const tf = scores["T/F"] >= 0 ? "T" : "F";
@@ -162,7 +148,6 @@ function finishTest() {
   }
 }
 
-// 显示结果卡片
 function displayResult(champion, mbtiLetter) {
   const questionArea = document.getElementById('question-area');
   const resultArea = document.getElementById('result-area');
@@ -172,27 +157,53 @@ function displayResult(champion, mbtiLetter) {
   const storyPreview = champion.story ? champion.story.replace(/<[^>]*>/g, '').substring(0, 280) + "..." : "暂无故事简介。";
   const avatarUrl = champion.image_url || 'https://ddragon.leagueoflegends.com/cdn/15.5.1/img/champion/default.png';
 
+  // 获取深度解析（优先英雄专属，否则按MBTI通用）
+  let analysis = {
+    title: "英雄本色",
+    personality: champion.mbti || mbtiLetter,
+    traits: "你的性格与这位英雄产生了共鸣。",
+    strengths: "有待发掘",
+    weaknesses: "有待发掘",
+    advice: "继续探索内心，找到真正的自己。",
+    quote: "“英雄，去超越。”"
+  };
+  if (window.getHeroDeepAnalysis) {
+    const custom = window.getHeroDeepAnalysis(champion);
+    if (custom) analysis = custom;
+  }
+
   resultArea.innerHTML = `
         <div class="champion-match">
             <div class="result-avatar">
                 <img src="${avatarUrl}" alt="${champion.name}" onerror="this.src='https://via.placeholder.com/100x100?text=No+Image'">
             </div>
-            <div class="mbti-badge">${mbtiLetter}</div>
+            <div class="mbti-badge">${analysis.personality}</div>
             <div class="match-name">${champion.name}</div>
             <div class="match-title">${champion.title || '符文之地英雄'}</div>
         </div>
-        <div class="story-preview">${storyPreview}</div>
+        <div class="analysis-section">
+            <h3>📊 人格解析</h3>
+            <p><strong>${analysis.title}</strong></p>
+            <p>${analysis.traits}</p>
+            <div class="analysis-grid">
+                <div class="strengths"><strong>✨ 优势</strong><br>${analysis.strengths}</div>
+                <div class="weaknesses"><strong>⚠️ 劣势</strong><br>${analysis.weaknesses}</div>
+            </div>
+            <div class="advice"><strong>💡 成长建议</strong><br>${analysis.advice}</div>
+            <div class="quote"><strong>🎭 英雄语录</strong><br>“${analysis.quote}”</div>
+        </div>
+        <div class="story-preview">
+            <strong>📖 背景故事</strong><br>${storyPreview}
+        </div>
         <div style="margin-top: 1rem;">
             <button id="restart-test" class="btn-primary">重新测试</button>
             <a href="catalog.html" class="btn-outline" style="margin-left: 1rem;">浏览图鉴</a>
         </div>
     `;
-
   const restartBtn = document.getElementById('restart-test');
   if (restartBtn) restartBtn.addEventListener('click', resetTest);
 }
 
-// 重置测试
 function resetTest() {
   currentIndex = 0;
   scores = { "I/E": 0, "N/S": 0, "T/F": 0, "J/P": 0 };
@@ -203,8 +214,7 @@ function resetTest() {
   renderQuestion();
 }
 
-// 页面加载
 window.addEventListener('DOMContentLoaded', async () => {
-  await loadChampions();   // loadChampions 定义在 data.js 中
+  await loadChampions();
   renderQuestion();
 });

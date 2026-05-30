@@ -19,7 +19,6 @@ body {
   position: relative;
 }
 
-/* 测试页背景光效 */
 .hero-bg {
   position: fixed;
   top: 0;
@@ -58,7 +57,6 @@ body {
   font-size: 1rem;
 }
 
-/* 问题卡片 */
 .question-card,
 .result-card {
   background: rgba(20, 28, 38, 0.85);
@@ -78,7 +76,6 @@ body {
   text-align: center;
 }
 
-/* 五点量表选项按钮 */
 .options-list {
   display: flex;
   flex-wrap: wrap;
@@ -115,7 +112,6 @@ body {
   margin-top: 1rem;
 }
 
-/* 结果卡片 */
 .result-card {
   text-align: center;
 }
@@ -213,7 +209,7 @@ body {
   margin-top: 2rem;
 }
 
-/* ========== 图鉴页面样式 ========== */
+/* 图鉴页面样式 */
 .catalog-page {
   max-width: 1400px;
 }
@@ -247,7 +243,6 @@ body {
   border-color: #e2b86b;
 }
 
-/* 英雄网格 */
 .champion-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -255,7 +250,6 @@ body {
   margin: 2rem 0;
 }
 
-/* 英雄卡片（带头像） */
 .champion-card {
   background: rgba(15, 23, 32, 0.7);
   backdrop-filter: blur(6px);
@@ -273,7 +267,6 @@ body {
   background: rgba(30, 40, 52, 0.85);
 }
 
-/* 英雄头像容器 */
 .champion-avatar {
   width: 80px;
   height: 80px;
@@ -333,7 +326,7 @@ body {
   color: #aaa;
 }
 
-/* ========== 模态框样式 ========== */
+/* 模态框样式 */
 .modal {
   display: none;
   position: fixed;
@@ -385,7 +378,53 @@ body {
   display: block;
 }
 
-/* ========== 响应式调整 ========== */
+/* 深度解析区域样式 */
+.analysis-section {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 24px;
+  padding: 1.2rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.analysis-section h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+  color: #e2b86b;
+  border-left: 4px solid #e2b86b;
+  padding-left: 12px;
+}
+
+.analysis-grid {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.strengths,
+.weaknesses {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 0.8rem;
+  min-width: 180px;
+}
+
+.advice,
+.quote {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+}
+
+.quote {
+  font-style: italic;
+  color: #d4c5a9;
+}
+
+/* 响应式调整 */
 @media (max-width: 640px) {
   .app-container {
     padding: 1rem;
@@ -411,5 +450,9 @@ body {
 
   .modal-content {
     padding: 1.2rem;
+  }
+
+  .analysis-grid {
+    flex-direction: column;
   }
 }
